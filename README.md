@@ -97,6 +97,51 @@ Without any custom config, the plugin defaults to:
 - Reversible redaction mode
 - No `entityTypes` filter (lets Redact apply its full built-in recognizer set for broad PII/HIPAA/GDPR-oriented coverage)
 
+## Production profile (high-throughput)
+
+For sustained production load, pin a stable host port, increase request timeout,
+and proactively pull the image at startup to reduce first-failure recovery latency.
+
+```json
+{
+  "plugins": {
+    "entries": {
+      "censgate-redact": {
+        "enabled": true,
+        "config": {
+          "mode": "reversible",
+          "excludeAgents": [],
+          "logRedactions": false,
+          "http": {
+            "endpoint": "http://127.0.0.1:18080",
+            "timeoutMs": 3000,
+            "language": "en",
+            "docker": {
+              "enabled": true,
+              "image": "ghcr.io/censgate/redact:full",
+              "containerName": "openclaw-redact-api",
+              "host": "127.0.0.1",
+              "hostPort": 18080,
+              "containerPort": 8080,
+              "pull": true,
+              "restartOnFailure": true,
+              "startupTimeoutMs": 45000,
+              "startupProbeIntervalMs": 500
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+Recommended notes:
+- Keep `entityTypes` unset unless you intentionally need to reduce scope.
+- Use `mode: "irreversible"` for strictly untrusted downstream workflows.
+- If running multiple OpenClaw instances on one host, give each a unique
+  `containerName` and `hostPort`.
+
 ## Development
 
 ```bash
