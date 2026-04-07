@@ -76,7 +76,7 @@ When `http.docker.enabled` is `true`, the plugin will:
 ## Environment variables
 
 - `REDACT_API_ENDPOINT` (default: `http://127.0.0.1:8080`)
-- `REDACT_DOCKER_AUTOSTART` (`true|false`, default `false`)
+- `REDACT_DOCKER_AUTOSTART` (`true|false`, default `true`)
 - `REDACT_DOCKER_IMAGE` (default `ghcr.io/censgate/redact:full`)
 - `REDACT_DOCKER_CONTAINER_NAME` (default `openclaw-redact-api`)
 - `REDACT_DOCKER_HOST` (default `127.0.0.1`)
@@ -86,6 +86,16 @@ When `http.docker.enabled` is `true`, the plugin will:
 - `REDACT_DOCKER_RESTART_ON_FAILURE` (`true|false`, default `true`)
 - `REDACT_DOCKER_STARTUP_TIMEOUT_MS` (default `30000`)
 - `REDACT_DOCKER_STARTUP_PROBE_INTERVAL_MS` (default `500`)
+
+## Default posture (out-of-the-box)
+
+Without any custom config, the plugin defaults to:
+- Docker-backed Redact auto-start enabled
+- ONNX-capable image: `ghcr.io/censgate/redact:full`
+- Dynamic host port assignment (avoids collisions)
+- Runtime self-healing + restart-on-failure
+- Reversible redaction mode
+- No `entityTypes` filter (lets Redact apply its full built-in recognizer set for broad PII/HIPAA/GDPR-oriented coverage)
 
 ## Development
 

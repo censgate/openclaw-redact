@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { OpenClawRedactPlugin } from "../src/plugin.js";
+import { resolveConfig } from "../src/config.js";
 
 describe("OpenClawRedactPlugin", () => {
   const fetchMock = vi.fn();
@@ -261,6 +262,17 @@ describe("OpenClawRedactPlugin", () => {
     expect(bootstrapper.ensureRunning.mock.calls[1][1]).toEqual({
       restartIfRunning: true,
     });
+  });
+});
+
+describe("default config posture", () => {
+  it("defaults to resilient docker + full image + broad entity coverage", () => {
+    const config = resolveConfig();
+    expect(config.config.http.docker?.enabled).toBe(true);
+    expect(config.config.http.docker?.image).toBe("ghcr.io/censgate/redact:full");
+    expect(config.config.http.docker?.restartOnFailure).toBe(true);
+    expect(config.config.http.hostPort).toBeUndefined();
+    expect(config.config.http.entityTypes).toBeUndefined();
   });
 });
 

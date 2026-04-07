@@ -7,7 +7,7 @@ import type {
 } from "./types.js";
 
 const DEFAULT_DOCKER_CONFIG: DockerAutomationConfig = {
-  enabled: parseBoolean(process.env.REDACT_DOCKER_AUTOSTART, false),
+  enabled: parseBoolean(process.env.REDACT_DOCKER_AUTOSTART, true),
   image: process.env.REDACT_DOCKER_IMAGE ?? "ghcr.io/censgate/redact:full",
   containerName: process.env.REDACT_DOCKER_CONTAINER_NAME ?? "openclaw-redact-api",
   host: process.env.REDACT_DOCKER_HOST ?? "127.0.0.1",
@@ -32,6 +32,7 @@ const DEFAULT_HTTP_CONFIG: HttpBackendConfig = {
   endpoint: process.env.REDACT_API_ENDPOINT ?? "http://127.0.0.1:8080",
   timeoutMs: 1500,
   language: "en",
+  entityTypes: parseEntityTypes(process.env.REDACT_ENTITY_TYPES),
   docker: DEFAULT_DOCKER_CONFIG,
 };
 
@@ -143,4 +144,13 @@ function parseOptionalInteger(value: string | undefined): number | undefined {
   if (!value) return undefined;
   const parsed = Number.parseInt(value, 10);
   return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function parseEntityTypes(value: string | undefined): string[] | undefined {
+  if (!value) return undefined;
+  const parsed = value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  return parsed.length > 0 ? parsed : undefined;
 }
