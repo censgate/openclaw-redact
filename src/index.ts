@@ -12,6 +12,7 @@ export type {
   RedactionResult,
   DetectionResult,
   HttpBackendConfig,
+  DockerAutomationConfig,
   DetectOptions,
   RedactOptions,
   PluginConfig,

@@ -134,6 +134,61 @@ describe("OpenClawRedactPlugin", () => {
 
     expect(plugin.getStoredTokens(turnId)).toBeUndefined();
   });
+
+  it("auto-start updates endpoint when dynamic port is assigned", async () => {
+    const bootstrapper = {
+      ensureRunning: vi
+        .fn()
+        .mockResolvedValue({ endpoint: "http://127.0.0.1:19090" }),
+    };
+    fetchMock
+      .mockRejectedValueOnce(new Error("fetch failed"))
+      // readiness probe after bootstrap
+      .mockResolvedValueOnce(createResponse({ results: [] }))
+      // retry of the original redact call
+      .mockResolvedValueOnce(
+        createResponse({
+          results: [
+            {
+              entity_type: "EMAIL_ADDRESS",
+              start: 12,
+              end: 28,
+              score: 0.9,
+              text: "user@example.com",
+            },
+          ],
+        }),
+      );
+
+    const plugin = new OpenClawRedactPlugin(
+      {
+        config: {
+          http: {
+            endpoint: "http://127.0.0.1:8080",
+            timeoutMs: 1000,
+            language: "en",
+            docker: {
+              enabled: true,
+            },
+          },
+        },
+      },
+      {
+        fetchImpl: fetchMock as typeof fetch,
+        backendBootstrapper: bootstrapper,
+      },
+    );
+
+    const result = await plugin.preLLMHook({
+      message: "My email is user@example.com",
+    });
+
+    expect(result.message).not.toContain("user@example.com");
+    expect(bootstrapper.ensureRunning).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls[1][0]).toContain("127.0.0.1:19090");
+    expect(fetchMock.mock.calls[2][0]).toContain("127.0.0.1:19090");
+  });
 });
 
 function mockEmailDetection(fetchMock: ReturnType<typeof vi.fn>): void {

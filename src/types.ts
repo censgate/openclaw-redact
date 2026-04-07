@@ -44,6 +44,19 @@ export interface HttpBackendConfig {
   language: string;
   entityTypes?: string[];
   headers?: Record<string, string>;
+  docker?: DockerAutomationConfig;
+}
+
+export interface DockerAutomationConfig {
+  enabled: boolean;
+  image: string;
+  containerName: string;
+  host: string;
+  hostPort?: number;
+  containerPort: number;
+  pull: boolean;
+  startupTimeoutMs: number;
+  startupProbeIntervalMs: number;
 }
 
 export interface DetectOptions {
@@ -71,7 +84,9 @@ export interface PluginConfigInput {
     mode?: RedactionMode;
     excludeAgents?: string[];
     logRedactions?: boolean;
-    http?: Partial<HttpBackendConfig>;
+    http?: Omit<Partial<HttpBackendConfig>, "docker"> & {
+      docker?: Partial<DockerAutomationConfig>;
+    };
   };
 }
 
