@@ -1,0 +1,61 @@
+{
+  "name": "@censgate/openclaw-redact",
+  "version": "0.1.0",
+  "description": "OpenClaw plugin for privacy-preserving LLM interactions via PII redaction",
+  "main": "dist/index.js",
+  "type": "module",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
+    "benchmark": "tsx benchmarks/redaction.bench.ts",
+    "lint": "eslint src/ tests/",
+    "lint:fix": "eslint src/ tests/ --fix",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "openclaw",
+    "openclaw-plugin",
+    "redaction",
+    "pii",
+    "privacy",
+    "llm",
+    "censgate"
+  ],
+  "author": "Censgate <oss@censgate.com>",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/censgate/openclaw-redact.git"
+  },
+  "bugs": {
+    "url": "https://github.com/censgate/openclaw-redact/issues"
+  },
+  "homepage": "https://github.com/censgate/openclaw-redact#readme",
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0",
+    "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "uuid": "^11.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
