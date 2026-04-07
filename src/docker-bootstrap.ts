@@ -2,11 +2,17 @@ import { spawn } from "node:child_process";
 import type { HttpBackendConfig } from "./types.js";
 
 export interface BackendBootstrapper {
-  ensureRunning(httpConfig: HttpBackendConfig): Promise<{ endpoint: string }>;
+  ensureRunning(
+    httpConfig: HttpBackendConfig,
+    options?: { restartIfRunning?: boolean },
+  ): Promise<{ endpoint: string }>;
 }
 
 export class DockerBackendBootstrapper implements BackendBootstrapper {
-  async ensureRunning(httpConfig: HttpBackendConfig): Promise<{ endpoint: string }> {
+  async ensureRunning(
+    httpConfig: HttpBackendConfig,
+    options?: { restartIfRunning?: boolean },
+  ): Promise<{ endpoint: string }> {
     const dockerConfig = httpConfig.docker;
     if (!dockerConfig?.enabled) {
       return { endpoint: httpConfig.endpoint };
@@ -20,6 +26,9 @@ export class DockerBackendBootstrapper implements BackendBootstrapper {
 
     const isRunning = await this.isContainerRunning(dockerConfig.containerName);
     if (isRunning) {
+      if (options?.restartIfRunning) {
+        await runDockerCommand(["restart", dockerConfig.containerName]);
+      }
       return {
         endpoint: await this.resolveEndpoint(httpConfig),
       };

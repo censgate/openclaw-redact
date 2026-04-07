@@ -47,7 +47,8 @@ Configure in `openclaw.json`:
               "image": "ghcr.io/censgate/redact:full",
               "containerName": "openclaw-redact-api",
               "host": "127.0.0.1",
-              "containerPort": 8080
+              "containerPort": 8080,
+              "restartOnFailure": true
             }
           }
         }
@@ -62,6 +63,8 @@ When `http.docker.enabled` is `true`, the plugin will:
 - if unreachable, auto-start/reuse the Docker container
 - detect the mapped host port (including dynamic/random port assignment)
 - update the runtime endpoint and retry automatically
+- if the backend later becomes unreachable while OpenClaw is running, it retries
+  bootstrap and (optionally) restarts the running container
 
 ## How it works
 
@@ -80,6 +83,7 @@ When `http.docker.enabled` is `true`, the plugin will:
 - `REDACT_DOCKER_HOST_PORT` (optional; if omitted, Docker chooses a free port)
 - `REDACT_DOCKER_CONTAINER_PORT` (default `8080`)
 - `REDACT_DOCKER_PULL` (`true|false`, default `false`)
+- `REDACT_DOCKER_RESTART_ON_FAILURE` (`true|false`, default `true`)
 - `REDACT_DOCKER_STARTUP_TIMEOUT_MS` (default `30000`)
 - `REDACT_DOCKER_STARTUP_PROBE_INTERVAL_MS` (default `500`)
 

@@ -189,6 +189,79 @@ describe("OpenClawRedactPlugin", () => {
     expect(fetchMock.mock.calls[1][0]).toContain("127.0.0.1:19090");
     expect(fetchMock.mock.calls[2][0]).toContain("127.0.0.1:19090");
   });
+
+  it("self-heals on later backend outages while running", async () => {
+    const bootstrapper = {
+      ensureRunning: vi
+        .fn()
+        .mockResolvedValue({ endpoint: "http://127.0.0.1:19090" }),
+    };
+
+    fetchMock
+      // First request: fail, bootstrap readiness, retry success
+      .mockRejectedValueOnce(new Error("fetch failed"))
+      .mockResolvedValueOnce(createResponse({ results: [] }))
+      .mockResolvedValueOnce(
+        createResponse({
+          results: [
+            {
+              entity_type: "EMAIL_ADDRESS",
+              start: 12,
+              end: 28,
+              score: 0.9,
+              text: "user@example.com",
+            },
+          ],
+        }),
+      )
+      // Second request: fail again, bootstrap readiness, retry success
+      .mockRejectedValueOnce(new Error("fetch failed"))
+      .mockResolvedValueOnce(createResponse({ results: [] }))
+      .mockResolvedValueOnce(
+        createResponse({
+          results: [
+            {
+              entity_type: "EMAIL_ADDRESS",
+              start: 12,
+              end: 28,
+              score: 0.9,
+              text: "user@example.com",
+            },
+          ],
+        }),
+      );
+
+    const plugin = new OpenClawRedactPlugin(
+      {
+        config: {
+          http: {
+            endpoint: "http://127.0.0.1:8080",
+            timeoutMs: 1000,
+            language: "en",
+            docker: {
+              enabled: true,
+              restartOnFailure: true,
+            },
+          },
+        },
+      },
+      {
+        fetchImpl: fetchMock as typeof fetch,
+        backendBootstrapper: bootstrapper,
+      },
+    );
+
+    await plugin.preLLMHook({ message: "My email is user@example.com" });
+    await plugin.preLLMHook({ message: "My email is user@example.com" });
+
+    expect(bootstrapper.ensureRunning).toHaveBeenCalledTimes(2);
+    expect(bootstrapper.ensureRunning.mock.calls[0][1]).toEqual({
+      restartIfRunning: false,
+    });
+    expect(bootstrapper.ensureRunning.mock.calls[1][1]).toEqual({
+      restartIfRunning: true,
+    });
+  });
 });
 
 function mockEmailDetection(fetchMock: ReturnType<typeof vi.fn>): void {

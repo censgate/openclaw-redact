@@ -14,6 +14,10 @@ const DEFAULT_DOCKER_CONFIG: DockerAutomationConfig = {
   hostPort: parseOptionalInteger(process.env.REDACT_DOCKER_HOST_PORT),
   containerPort: parseInteger(process.env.REDACT_DOCKER_CONTAINER_PORT, 8080),
   pull: parseBoolean(process.env.REDACT_DOCKER_PULL, false),
+  restartOnFailure: parseBoolean(
+    process.env.REDACT_DOCKER_RESTART_ON_FAILURE,
+    true,
+  ),
   startupTimeoutMs: parseInteger(
     process.env.REDACT_DOCKER_STARTUP_TIMEOUT_MS,
     30000,
@@ -106,6 +110,10 @@ export function resolveConfig(
             userConfig.config?.http?.docker?.pull ??
             DEFAULT_CONFIG.config.http.docker?.pull ??
             DEFAULT_DOCKER_CONFIG.pull,
+          restartOnFailure:
+            userConfig.config?.http?.docker?.restartOnFailure ??
+            DEFAULT_CONFIG.config.http.docker?.restartOnFailure ??
+            DEFAULT_DOCKER_CONFIG.restartOnFailure,
           startupTimeoutMs:
             userConfig.config?.http?.docker?.startupTimeoutMs ??
             DEFAULT_CONFIG.config.http.docker?.startupTimeoutMs ??

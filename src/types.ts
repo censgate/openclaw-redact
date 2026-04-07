@@ -55,6 +55,7 @@ export interface DockerAutomationConfig {
   hostPort?: number;
   containerPort: number;
   pull: boolean;
+  restartOnFailure: boolean;
   startupTimeoutMs: number;
   startupProbeIntervalMs: number;
 }

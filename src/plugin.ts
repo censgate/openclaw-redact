@@ -142,7 +142,7 @@ export class OpenClawRedactPlugin {
 
   private shouldAttemptDockerBootstrap(error: unknown): boolean {
     const dockerConfig = this.config.config.http.docker;
-    if (!dockerConfig?.enabled || this.backendBootstrapped) {
+    if (!dockerConfig?.enabled) {
       return false;
     }
 
@@ -161,10 +161,6 @@ export class OpenClawRedactPlugin {
   }
 
   private async ensureBackendBootstrapped(): Promise<void> {
-    if (this.backendBootstrapped) {
-      return;
-    }
-
     if (!this.backendBootstrapPromise) {
       this.backendBootstrapPromise = this.bootstrapAndWaitForReadiness();
     }
@@ -181,7 +177,13 @@ export class OpenClawRedactPlugin {
     }
 
     try {
-      const bootstrapResult = await this.backendBootstrapper.ensureRunning(httpConfig);
+      const bootstrapResult = await this.backendBootstrapper.ensureRunning(
+        httpConfig,
+        {
+          restartIfRunning:
+            this.backendBootstrapped && dockerConfig.restartOnFailure,
+        },
+      );
       if (bootstrapResult.endpoint && bootstrapResult.endpoint !== httpConfig.endpoint) {
         this.config = {
           ...this.config,
