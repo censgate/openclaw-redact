@@ -65,4 +65,18 @@ describe("detect", () => {
     expect(result.entityCount).toBe(1);
     expect(result.entities[0].type).toBe("order_id");
   });
+
+  it("supports custom patterns without global flag", () => {
+    const result = detect("Order IDs: ORD-12345 and ORD-67890", [], [
+      {
+        name: "order_id",
+        category: "custom",
+        pattern: /ORD-\d{5}/,
+        description: "Order IDs",
+      },
+    ]);
+    expect(result.entityCount).toBe(2);
+    expect(result.entities[0].value).toBe("ORD-12345");
+    expect(result.entities[1].value).toBe("ORD-67890");
+  });
 });

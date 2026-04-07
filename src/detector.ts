@@ -19,7 +19,7 @@ export function detect(
   const entities: DetectedEntity[] = [];
 
   for (const entityPattern of allPatterns) {
-    const regex = new RegExp(entityPattern.pattern.source, entityPattern.pattern.flags);
+    const regex = toGlobalRegex(entityPattern.pattern);
     let match: RegExpExecArray | null;
 
     while ((match = regex.exec(text)) !== null) {
@@ -43,6 +43,13 @@ export function detect(
     entities: filtered,
     entityCount: filtered.length,
   };
+}
+
+function toGlobalRegex(pattern: RegExp): RegExp {
+  const flags = pattern.flags.includes("g")
+    ? pattern.flags
+    : `${pattern.flags}g`;
+  return new RegExp(pattern.source, flags);
 }
 
 function removeOverlaps(entities: DetectedEntity[]): DetectedEntity[] {

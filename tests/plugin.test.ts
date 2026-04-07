@@ -86,4 +86,16 @@ describe("OpenClawRedactPlugin", () => {
     plugin.clearTokenStore();
     expect(plugin.getStoredTokens(turnId)).toBeUndefined();
   });
+
+  it("does not store tokens for clean messages", () => {
+    const plugin = new OpenClawRedactPlugin();
+    const turnId = "test-turn-clean";
+
+    plugin.preLLMHook({
+      message: "Hello world, no sensitive data here",
+      metadata: { turnId },
+    });
+
+    expect(plugin.getStoredTokens(turnId)).toBeUndefined();
+  });
 });

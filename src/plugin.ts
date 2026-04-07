@@ -44,7 +44,9 @@ export class OpenClawRedactPlugin {
     // Store tokens for potential restoration keyed by a conversation turn id
     const turnId =
       (context.metadata?.turnId as string) ?? crypto.randomUUID();
-    this.tokenStore.set(turnId, result.tokens);
+    if (result.tokens.length > 0) {
+      this.tokenStore.set(turnId, result.tokens);
+    }
 
     return {
       message: result.redactedText,
@@ -68,6 +70,7 @@ export class OpenClawRedactPlugin {
 
     const tokens = this.tokenStore.get(turnId);
     if (!tokens || tokens.length === 0) {
+      this.tokenStore.delete(turnId);
       return { message: context.message, metadata: context.metadata };
     }
 
