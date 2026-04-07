@@ -3,25 +3,22 @@ export { restore } from "./restorer.js";
 export { detect } from "./detector.js";
 export { OpenClawRedactPlugin } from "./plugin.js";
 export { resolveConfig } from "./config.js";
-export {
-  getPatterns,
-  getAllPatterns,
-  piiPatterns,
-  financialPatterns,
-  credentialPatterns,
-  healthcarePatterns,
-  locationPatterns,
-} from "./patterns/index.js";
+export { RedactHttpClient } from "./http-client.js";
 export type {
   RedactionMode,
   EntityCategory,
-  EntityPattern,
   DetectedEntity,
   RedactionToken,
   RedactionResult,
   DetectionResult,
+  HttpBackendConfig,
+  DetectOptions,
   RedactOptions,
   PluginConfig,
+  PluginConfigInput,
+  RedactApiAnalyzeRequest,
+  RedactApiAnalyzeItem,
+  RedactApiAnalyzeResponse,
   OpenClawHookContext,
   OpenClawHookResult,
 } from "./types.js";

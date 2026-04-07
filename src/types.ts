@@ -2,18 +2,11 @@ export type RedactionMode = "reversible" | "irreversible" | "audit-only";
 
 export type EntityCategory =
   | "pii"
-  | "credentials"
   | "financial"
   | "healthcare"
   | "location"
-  | "custom";
-
-export interface EntityPattern {
-  name: string;
-  category: EntityCategory;
-  pattern: RegExp;
-  description?: string;
-}
+  | "credentials"
+  | "unknown";
 
 export interface DetectedEntity {
   type: string;
@@ -21,6 +14,8 @@ export interface DetectedEntity {
   value: string;
   start: number;
   end: number;
+  score?: number;
+  recognizerName?: string;
 }
 
 export interface RedactionToken {
@@ -40,23 +35,67 @@ export interface RedactionResult {
 export interface DetectionResult {
   entities: DetectedEntity[];
   entityCount: number;
+  processingTimeMs?: number;
 }
 
-export interface RedactOptions {
+export interface HttpBackendConfig {
+  endpoint: string;
+  timeoutMs: number;
+  language: string;
+  entityTypes?: string[];
+  headers?: Record<string, string>;
+}
+
+export interface DetectOptions {
+  http: HttpBackendConfig;
+  fetchImpl?: typeof fetch;
+}
+
+export interface RedactOptions extends DetectOptions {
   mode?: RedactionMode;
-  entities?: EntityCategory[];
-  customPatterns?: EntityPattern[];
-  excludePatterns?: string[];
 }
 
 export interface PluginConfig {
   enabled: boolean;
   config: {
     mode: RedactionMode;
-    entities: EntityCategory[];
-    customPatterns: EntityPattern[];
     excludeAgents: string[];
     logRedactions: boolean;
+    http: HttpBackendConfig;
+  };
+}
+
+export interface PluginConfigInput {
+  enabled?: boolean;
+  config?: {
+    mode?: RedactionMode;
+    excludeAgents?: string[];
+    logRedactions?: boolean;
+    http?: Partial<HttpBackendConfig>;
+  };
+}
+
+export interface RedactApiAnalyzeRequest {
+  text: string;
+  language?: string;
+  entities?: string[];
+}
+
+export interface RedactApiAnalyzeItem {
+  entity_type: string;
+  start: number;
+  end: number;
+  score: number;
+  text?: string;
+  recognizer_name?: string;
+}
+
+export interface RedactApiAnalyzeResponse {
+  results: RedactApiAnalyzeItem[];
+  metadata?: {
+    processing_time_ms?: number;
+    recognizers_used?: number;
+    language?: string;
   };
 }
 

@@ -6,16 +6,23 @@ import type {
   RedactionToken,
 } from "./types.js";
 import { detect } from "./detector.js";
+import { resolveConfig } from "./config.js";
 
-export function redact(
+export async function redact(
   text: string,
-  options: RedactOptions = {},
-): RedactionResult {
-  const mode: RedactionMode = options.mode ?? "reversible";
-  const entities = options.entities;
-  const customPatterns = options.customPatterns;
-
-  const detection = detect(text, entities, customPatterns);
+  options?: Partial<RedactOptions>,
+): Promise<RedactionResult> {
+  const defaults = resolveConfig().config;
+  const mergedOptions: RedactOptions = {
+    mode: options?.mode ?? defaults.mode,
+    http: options?.http ?? defaults.http,
+    fetchImpl: options?.fetchImpl,
+  };
+  const mode: RedactionMode = mergedOptions.mode ?? "reversible";
+  const detection = await detect(text, {
+    http: mergedOptions.http,
+    fetchImpl: mergedOptions.fetchImpl,
+  });
 
   if (detection.entityCount === 0) {
     return { redactedText: text, tokens: [], entityCount: 0 };
@@ -57,7 +64,7 @@ function createToken(
       id,
       type,
       category: category as RedactionToken["category"],
-      placeholder: `[REDACTED:${category}_${type}:${id}]`,
+      placeholder: `[REDACTED:${type}:${id}]`,
       originalValue,
     };
   }
@@ -70,6 +77,6 @@ function createToken(
     placeholder:
       mode === "audit-only"
         ? originalValue
-        : `[REDACTED:${category}_${type}]`,
+        : `[REDACTED:${type}]`,
   };
 }

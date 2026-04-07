@@ -1,37 +1,26 @@
 import type {
   DetectedEntity,
+  DetectOptions,
   DetectionResult,
   EntityCategory,
-  EntityPattern,
 } from "./types.js";
-import { getAllPatterns, getPatterns } from "./patterns/index.js";
+import { RedactHttpClient } from "./http-client.js";
 
-export function detect(
+export async function detect(
   text: string,
-  categories?: EntityCategory[],
-  customPatterns?: EntityPattern[],
-): DetectionResult {
-  const patterns = categories ? getPatterns(categories) : getAllPatterns();
-  const allPatterns = customPatterns
-    ? [...patterns, ...customPatterns]
-    : patterns;
-
-  const entities: DetectedEntity[] = [];
-
-  for (const entityPattern of allPatterns) {
-    const regex = toGlobalRegex(entityPattern.pattern);
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(text)) !== null) {
-      entities.push({
-        type: entityPattern.name,
-        category: entityPattern.category,
-        value: match[0],
-        start: match.index,
-        end: match.index + match[0].length,
-      });
-    }
-  }
+  options: DetectOptions,
+): Promise<DetectionResult> {
+  const client = new RedactHttpClient(options.http, options.fetchImpl);
+  const analysis = await client.analyze(text);
+  const entities: DetectedEntity[] = analysis.results.map((item) => ({
+    type: item.entity_type,
+    category: mapCategory(item.entity_type),
+    value: item.text ?? text.slice(item.start, item.end),
+    start: item.start,
+    end: item.end,
+    score: item.score,
+    recognizerName: item.recognizer_name,
+  }));
 
   // Sort by position, longer matches first for overlapping
   entities.sort((a, b) => a.start - b.start || b.end - a.end);
@@ -42,14 +31,60 @@ export function detect(
   return {
     entities: filtered,
     entityCount: filtered.length,
+    processingTimeMs: analysis.metadata?.processing_time_ms,
   };
 }
 
-function toGlobalRegex(pattern: RegExp): RegExp {
-  const flags = pattern.flags.includes("g")
-    ? pattern.flags
-    : `${pattern.flags}g`;
-  return new RegExp(pattern.source, flags);
+function mapCategory(entityType: string): EntityCategory {
+  const normalized = entityType.toUpperCase();
+
+  if (
+    normalized.includes("CARD") ||
+    normalized.includes("BANK") ||
+    normalized.includes("IBAN") ||
+    normalized.includes("CRYPTO") ||
+    normalized.includes("BTC") ||
+    normalized.includes("ETH")
+  ) {
+    return "financial";
+  }
+
+  if (
+    normalized.includes("MEDICAL") ||
+    normalized.includes("NHS") ||
+    normalized.includes("NINO")
+  ) {
+    return "healthcare";
+  }
+
+  if (
+    normalized.includes("PERSON") ||
+    normalized.includes("ORGANIZATION") ||
+    normalized.includes("LOCATION") ||
+    normalized.includes("POSTCODE") ||
+    normalized.includes("ZIP")
+  ) {
+    return "location";
+  }
+
+  if (
+    normalized.includes("EMAIL") ||
+    normalized.includes("PHONE") ||
+    normalized.includes("PASSPORT") ||
+    normalized.includes("SSN")
+  ) {
+    return "pii";
+  }
+
+  if (
+    normalized.includes("TOKEN") ||
+    normalized.includes("KEY") ||
+    normalized.includes("HASH")
+  ) {
+    return "credentials";
+  }
+
+  return "unknown";
 }
 
 function removeOverlaps(entities: DetectedEntity[]): DetectedEntity[] {

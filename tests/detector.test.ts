@@ -1,82 +1,93 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { detect } from "../src/detector.js";
 
 describe("detect", () => {
-  it("detects email addresses", () => {
-    const result = detect("Contact me at john@example.com please", ["pii"]);
+  const fetchMock = vi.fn();
+  const http = {
+    endpoint: "http://localhost:8080",
+    timeoutMs: 1000,
+    language: "en",
+  };
+
+  afterEach(() => {
+    fetchMock.mockReset();
+  });
+
+  it("maps API detections into entities", async () => {
+    fetchMock.mockResolvedValue(
+      createResponse({
+        results: [
+          {
+            entity_type: "EMAIL_ADDRESS",
+            start: 14,
+            end: 30,
+            score: 0.9,
+            text: "john@example.com",
+            recognizer_name: "PatternRecognizer",
+          },
+        ],
+        metadata: { processing_time_ms: 2 },
+      }),
+    );
+
+    const result = await detect("Contact me at john@example.com please", {
+      http,
+      fetchImpl: fetchMock as typeof fetch,
+    });
+
     expect(result.entityCount).toBe(1);
-    expect(result.entities[0].type).toBe("email");
+    expect(result.processingTimeMs).toBe(2);
+    expect(result.entities[0].type).toBe("EMAIL_ADDRESS");
+    expect(result.entities[0].category).toBe("pii");
     expect(result.entities[0].value).toBe("john@example.com");
   });
 
-  it("detects SSNs", () => {
-    const result = detect("SSN: 123-45-6789", ["pii"]);
-    expect(result.entities.some((e) => e.type === "ssn")).toBe(true);
-  });
-
-  it("detects credit card numbers", () => {
-    const result = detect(
-      "Card: 4111 1111 1111 1111",
-      ["financial"],
+  it("removes overlapping detections", async () => {
+    const text = "Contact john@example.com";
+    fetchMock.mockResolvedValue(
+      createResponse({
+        results: [
+          {
+            entity_type: "EMAIL_ADDRESS",
+            start: 8,
+            end: 24,
+            score: 0.9,
+            text: "john@example.com",
+          },
+          {
+            entity_type: "DOMAIN_NAME",
+            start: 13,
+            end: 24,
+            score: 0.7,
+            text: "example.com",
+          },
+        ],
+      }),
     );
-    expect(result.entityCount).toBeGreaterThan(0);
+
+    const result = await detect(text, {
+      http,
+      fetchImpl: fetchMock as typeof fetch,
+    });
+    expect(result.entities).toHaveLength(1);
+    expect(result.entities[0].type).toBe("EMAIL_ADDRESS");
   });
 
-  it("detects AWS access keys", () => {
-    const result = detect("Key: AKIAIOSFODNN7EXAMPLE", ["credentials"]);
-    expect(result.entities.some((e) => e.type === "aws_access_key")).toBe(true);
-  });
-
-  it("detects GitHub tokens", () => {
-    const result = detect(
-      "Token: ghp_ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk",
-      ["credentials"],
-    );
-    expect(result.entities.some((e) => e.type === "github_token")).toBe(true);
-  });
-
-  it("detects medical record numbers", () => {
-    const result = detect("MRN: 12345678", ["healthcare"]);
-    expect(result.entities.some((e) => e.type === "mrn")).toBe(true);
-  });
-
-  it("detects multiple entity types", () => {
-    const text =
-      "Email: user@test.com, SSN: 999-88-7777, Key: AKIAIOSFODNN7EXAMPLE";
-    const result = detect(text, ["pii", "credentials"]);
-    expect(result.entityCount).toBeGreaterThanOrEqual(3);
-  });
-
-  it("returns empty results for clean text", () => {
-    const result = detect("Hello world, this is a test.", ["pii"]);
+  it("returns empty results when API finds no entities", async () => {
+    fetchMock.mockResolvedValue(createResponse({ results: [] }));
+    const result = await detect("Hello world, this is a test.", {
+      http,
+      fetchImpl: fetchMock as typeof fetch,
+    });
     expect(result.entityCount).toBe(0);
     expect(result.entities).toHaveLength(0);
   });
-
-  it("supports custom patterns", () => {
-    const result = detect("Order ID: ORD-12345", [], [
-      {
-        name: "order_id",
-        category: "custom",
-        pattern: /ORD-\d{5}/g,
-        description: "Order IDs",
-      },
-    ]);
-    expect(result.entityCount).toBe(1);
-    expect(result.entities[0].type).toBe("order_id");
-  });
-
-  it("supports custom patterns without global flag", () => {
-    const result = detect("Order IDs: ORD-12345 and ORD-67890", [], [
-      {
-        name: "order_id",
-        category: "custom",
-        pattern: /ORD-\d{5}/,
-        description: "Order IDs",
-      },
-    ]);
-    expect(result.entityCount).toBe(2);
-    expect(result.entities[0].value).toBe("ORD-12345");
-    expect(result.entities[1].value).toBe("ORD-67890");
-  });
 });
+
+function createResponse(body: unknown): Response {
+  return {
+    ok: true,
+    status: 200,
+    text: async () => JSON.stringify(body),
+  } as Response;
+}

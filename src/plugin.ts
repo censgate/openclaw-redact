@@ -2,6 +2,7 @@ import type {
   OpenClawHookContext,
   OpenClawHookResult,
   PluginConfig,
+  PluginConfigInput,
   RedactionToken,
 } from "./types.js";
 import { resolveConfig } from "./config.js";
@@ -11,16 +12,21 @@ import { restore } from "./restorer.js";
 export class OpenClawRedactPlugin {
   private config: PluginConfig;
   private tokenStore: Map<string, RedactionToken[]> = new Map();
+  private fetchImpl?: typeof fetch;
 
-  constructor(userConfig?: Partial<PluginConfig>) {
+  constructor(
+    userConfig?: PluginConfigInput,
+    options?: { fetchImpl?: typeof fetch },
+  ) {
     this.config = resolveConfig(userConfig);
+    this.fetchImpl = options?.fetchImpl;
   }
 
   get enabled(): boolean {
     return this.config.enabled;
   }
 
-  preLLMHook(context: OpenClawHookContext): OpenClawHookResult {
+  async preLLMHook(context: OpenClawHookContext): Promise<OpenClawHookResult> {
     if (!this.config.enabled) {
       return { message: context.message, metadata: context.metadata };
     }
@@ -29,10 +35,10 @@ export class OpenClawRedactPlugin {
       return { message: context.message, metadata: context.metadata };
     }
 
-    const result = redact(context.message, {
+    const result = await redact(context.message, {
       mode: this.config.config.mode,
-      entities: this.config.config.entities,
-      customPatterns: this.config.config.customPatterns,
+      http: this.config.config.http,
+      fetchImpl: this.fetchImpl,
     });
 
     if (result.entityCount > 0 && this.config.config.logRedactions) {
@@ -58,7 +64,7 @@ export class OpenClawRedactPlugin {
     };
   }
 
-  postLLMHook(context: OpenClawHookContext): OpenClawHookResult {
+  async postLLMHook(context: OpenClawHookContext): Promise<OpenClawHookResult> {
     if (!this.config.enabled) {
       return { message: context.message, metadata: context.metadata };
     }
@@ -85,9 +91,9 @@ export class OpenClawRedactPlugin {
     };
   }
 
-  toolCallHook(context: OpenClawHookContext): OpenClawHookResult {
+  async toolCallHook(context: OpenClawHookContext): Promise<OpenClawHookResult> {
     // Sanitize tool parameters the same as pre-LLM
-    return this.preLLMHook(context);
+    return await this.preLLMHook(context);
   }
 
   getStoredTokens(turnId: string): RedactionToken[] | undefined {
