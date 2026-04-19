@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:24-alpine
 WORKDIR /app
 COPY server.mjs ./
 ENV MOCK_LLM_PORT=3000

@@ -43,7 +43,7 @@ Tier 1 **does not** embed a full OpenClaw gateway; it exercises the same plugin 
 ## Prerequisites
 
 - Docker (for `ghcr.io/censgate/redact:full`)
-- Node.js 20+
+- Node.js 22.14+ (matches `openclaw` `engines`; LTS 22.x or 24.x recommended)
 
 ## Local generated files
 
