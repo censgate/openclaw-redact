@@ -1,0 +1,33 @@
+{
+  "id": "censgate-redact",
+  "name": "Censgate OpenClaw Redact",
+  "version": "0.1.0",
+  "description": "Privacy-preserving PII redaction for LLM-bound text via censgate/redact HTTP API.",
+  "providers": ["censgate-mock"],
+  "extensions": ["./dist/openclaw-plugin.js"],
+  "configSchema": {
+    "jsonSchema": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "config": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": ["reversible", "irreversible", "audit-only"]
+            },
+            "excludeAgents": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "logRedactions": { "type": "boolean" },
+            "http": { "type": "object", "additionalProperties": true }
+          }
+        }
+      }
+    }
+  }
+}

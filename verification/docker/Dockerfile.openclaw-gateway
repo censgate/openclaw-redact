@@ -1,0 +1,28 @@
+# Real OpenClaw image with censgate-redact installed from npm pack output.
+# OPENCLAW_TAG must match the CLI/runtime used for `openclaw plugins install` (see docs/VERIFICATION.md).
+ARG OPENCLAW_TAG=2026.4.15
+FROM ghcr.io/openclaw/openclaw:${OPENCLAW_TAG}
+
+USER root
+
+# Built on the host: `npm pack` → openclaw-redact.tgz copied as this context file.
+COPY openclaw-redact.tgz /tmp/openclaw-redact.tgz
+
+USER node
+
+ENV OPENCLAW_STATE_DIR=/home/node/.openclaw
+
+RUN mkdir -p /home/node/.openclaw \
+  && openclaw plugins install /tmp/openclaw-redact.tgz --force --dangerously-force-unsafe-install
+
+USER root
+
+COPY verification/openclaw/openclaw.json /home/node/.openclaw/openclaw.json
+
+RUN chown -R node:node /home/node/.openclaw
+
+USER node
+
+EXPOSE 18789
+
+CMD ["openclaw", "gateway"]

@@ -1,0 +1,8 @@
+# Local verification stack for ENG-56 — no OpenRouter or external LLM APIs.
+# Redact HTTP API only; tests run on the host against localhost.
+
+services:
+  redact:
+    image: ghcr.io/censgate/redact:full
+    ports:
+      - "8080:8080"

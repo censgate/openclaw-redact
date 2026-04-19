@@ -1,0 +1,36 @@
+services:
+  redact:
+    image: ghcr.io/censgate/redact:full
+    ports:
+      - "8080:8080"
+
+  mock-llm:
+    build:
+      context: ./verification/mock-llm
+    ports:
+      - "13000:3000"
+
+  openclaw-gateway:
+    build:
+      context: .
+      dockerfile: verification/docker/Dockerfile.openclaw-gateway
+      args:
+        OPENCLAW_TAG: ${OPENCLAW_TAG:-2026.4.15}
+    image: openclaw-redact-e2e:${OPENCLAW_TAG:-2026.4.15}
+    ports:
+      - "18789:18789"
+    depends_on:
+      - redact
+      - mock-llm
+    environment:
+      NODE_ENV: production
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-e2e-test-token}
+
+  openclaw-e2e:
+    profiles: ["cli"]
+    image: openclaw-redact-e2e:${OPENCLAW_TAG:-2026.4.15}
+    network_mode: "service:openclaw-gateway"
+    environment:
+      OPENCLAW_GATEWAY_URL: http://127.0.0.1:18789
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN:-e2e-test-token}
+    entrypoint: ["openclaw"]

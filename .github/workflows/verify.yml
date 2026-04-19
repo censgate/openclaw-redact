@@ -1,0 +1,63 @@
+name: Verify (ENG-56)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start Redact and run verification
+        run: make verify
+        env:
+          REDACT_VERIFY_ENDPOINT: http://127.0.0.1:8080
+
+      - name: Upload verification report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-report
+          path: verification-report.json
+          if-no-files-found: ignore
+
+  # Optional: real OpenClaw gateway + mock LLM (slower; does not block tier-1)
+  verify-openclaw-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: OpenClaw Docker E2E (tier 2)
+        continue-on-error: true
+        run: make verify-openclaw-e2e
+        env:
+          REDACT_VERIFY_ENDPOINT: http://127.0.0.1:8080
+          OPENCLAW_GATEWAY_URL: http://127.0.0.1:18789
+          OPENCLAW_TAG: 2026.4.15

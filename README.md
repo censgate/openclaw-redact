@@ -150,6 +150,26 @@ npm run build
 npm test
 ```
 
+Remove build output, npm pack tarballs, and verification artifacts: `make clean` (or `npm run clean`).
+
+## Verification suite (ENG-56)
+
+**Tier 1** — fast hook harness against a Dockerized **censgate/redact** API (no external LLM services):
+
+```bash
+make verify
+```
+
+Produces `verification-report.json` (gitignored) and uses Vitest configs in `vitest.verification.config.ts`.
+
+**Tier 2** — optional OpenClaw **gateway** in Docker with this plugin embedded (`npm pack` + `openclaw plugins install`), a mock OpenAI-compatible LLM, and an agent turn through the gateway:
+
+```bash
+make verify-openclaw-e2e
+```
+
+Pin the gateway image with `OPENCLAW_TAG` (see `Makefile` default). Tier 2 details, ports, and the optional gateway benchmark are documented in [docs/VERIFICATION.md](docs/VERIFICATION.md). Human-review samples remain under `verification/samples/`.
+
 ## Latency benchmark (Docker option)
 
 With Redact running in Docker:
@@ -170,6 +190,14 @@ Optional environment variables:
 - `BENCH_ITERATIONS` (default: `100`)
 - `BENCH_WARMUP` (default: `10`)
 - `BENCH_TEXT` (custom test payload)
+
+### OpenClaw gateway benchmark (tier 2)
+
+When the tier-2 compose stack from `docker-compose.openclaw-e2e.yml` is running, you can sample host → gateway → mock latency:
+
+```bash
+OPENCLAW_BENCHMARK=1 npm run benchmark:openclaw-gateway
+```
 
 ## License
 

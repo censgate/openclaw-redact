@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-04-18T00:00:00.000Z",
+  "redactEndpoint": "http://127.0.0.1:8080",
+  "targets": {
+    "piiDetectionRateMin": 0.99,
+    "falsePositiveRateMax": 0.01,
+    "redactionLatencyMsMax": 10,
+    "auditLogCompletenessPercent": 100,
+    "edgeCasesRequired": 5
+  },
+  "results": {
+    "piiDetectionRate": 1,
+    "falsePositiveRate": 0,
+    "medianLatencyMs": 360,
+    "medianProcessingTimeMs": 350,
+    "meetsLatencyTarget": false,
+    "meetsDetectionTarget": true,
+    "meetsFalsePositiveTarget": true
+  },
+  "metrics": {
+    "latencyMsSamples": [],
+    "processingTimeMsSamples": [],
+    "detectionPositiveCases": 1,
+    "detectionTotalCases": 1,
+    "falsePositiveCases": 0,
+    "falsePositiveTotalCases": 1
+  },
+  "notes": [
+    "Example shape only; run `make verify` to generate a fresh verification-report.json."
+  ]
+}

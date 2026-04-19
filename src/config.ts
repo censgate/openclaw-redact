@@ -59,68 +59,68 @@ export function resolveConfig(
     };
   }
 
+  // OpenClaw: api.pluginConfig is `plugins.entries.<id>.config` (flat). Harness: `{ config: { … } }`.
+  const inner = userConfig.config ?? userConfig;
+
   return {
     enabled: userConfig.enabled ?? DEFAULT_CONFIG.enabled,
     config: {
       mode:
-        (userConfig.config?.mode as RedactionMode) ??
-        DEFAULT_CONFIG.config.mode,
+        (inner.mode as RedactionMode) ?? DEFAULT_CONFIG.config.mode,
       excludeAgents:
-        (userConfig.config?.excludeAgents as string[]) ??
-        DEFAULT_CONFIG.config.excludeAgents,
+        (inner.excludeAgents as string[]) ?? DEFAULT_CONFIG.config.excludeAgents,
       logRedactions:
-        userConfig.config?.logRedactions ?? DEFAULT_CONFIG.config.logRedactions,
+        inner.logRedactions ?? DEFAULT_CONFIG.config.logRedactions,
       http: {
         endpoint:
-          userConfig.config?.http?.endpoint ?? DEFAULT_CONFIG.config.http.endpoint,
+          inner.http?.endpoint ?? DEFAULT_CONFIG.config.http.endpoint,
         timeoutMs:
-          userConfig.config?.http?.timeoutMs ?? DEFAULT_CONFIG.config.http.timeoutMs,
+          inner.http?.timeoutMs ?? DEFAULT_CONFIG.config.http.timeoutMs,
         language:
-          userConfig.config?.http?.language ?? DEFAULT_CONFIG.config.http.language,
+          inner.http?.language ?? DEFAULT_CONFIG.config.http.language,
         entityTypes:
-          userConfig.config?.http?.entityTypes ??
-          DEFAULT_CONFIG.config.http.entityTypes,
+          inner.http?.entityTypes ?? DEFAULT_CONFIG.config.http.entityTypes,
         headers:
-          userConfig.config?.http?.headers ?? DEFAULT_CONFIG.config.http.headers,
+          inner.http?.headers ?? DEFAULT_CONFIG.config.http.headers,
         docker: {
           enabled:
-            userConfig.config?.http?.docker?.enabled ??
+            inner.http?.docker?.enabled ??
             DEFAULT_CONFIG.config.http.docker?.enabled ??
             false,
           image:
-            userConfig.config?.http?.docker?.image ??
+            inner.http?.docker?.image ??
             DEFAULT_CONFIG.config.http.docker?.image ??
             DEFAULT_DOCKER_CONFIG.image,
           containerName:
-            userConfig.config?.http?.docker?.containerName ??
+            inner.http?.docker?.containerName ??
             DEFAULT_CONFIG.config.http.docker?.containerName ??
             DEFAULT_DOCKER_CONFIG.containerName,
           host:
-            userConfig.config?.http?.docker?.host ??
+            inner.http?.docker?.host ??
             DEFAULT_CONFIG.config.http.docker?.host ??
             DEFAULT_DOCKER_CONFIG.host,
           hostPort:
-            userConfig.config?.http?.docker?.hostPort ??
+            inner.http?.docker?.hostPort ??
             DEFAULT_CONFIG.config.http.docker?.hostPort ??
             DEFAULT_DOCKER_CONFIG.hostPort,
           containerPort:
-            userConfig.config?.http?.docker?.containerPort ??
+            inner.http?.docker?.containerPort ??
             DEFAULT_CONFIG.config.http.docker?.containerPort ??
             DEFAULT_DOCKER_CONFIG.containerPort,
           pull:
-            userConfig.config?.http?.docker?.pull ??
+            inner.http?.docker?.pull ??
             DEFAULT_CONFIG.config.http.docker?.pull ??
             DEFAULT_DOCKER_CONFIG.pull,
           restartOnFailure:
-            userConfig.config?.http?.docker?.restartOnFailure ??
+            inner.http?.docker?.restartOnFailure ??
             DEFAULT_CONFIG.config.http.docker?.restartOnFailure ??
             DEFAULT_DOCKER_CONFIG.restartOnFailure,
           startupTimeoutMs:
-            userConfig.config?.http?.docker?.startupTimeoutMs ??
+            inner.http?.docker?.startupTimeoutMs ??
             DEFAULT_CONFIG.config.http.docker?.startupTimeoutMs ??
             DEFAULT_DOCKER_CONFIG.startupTimeoutMs,
           startupProbeIntervalMs:
-            userConfig.config?.http?.docker?.startupProbeIntervalMs ??
+            inner.http?.docker?.startupProbeIntervalMs ??
             DEFAULT_CONFIG.config.http.docker?.startupProbeIntervalMs ??
             DEFAULT_DOCKER_CONFIG.startupProbeIntervalMs,
         },

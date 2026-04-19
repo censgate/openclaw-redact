@@ -79,16 +79,23 @@ export interface PluginConfig {
   };
 }
 
-export interface PluginConfigInput {
-  enabled?: boolean;
-  config?: {
-    mode?: RedactionMode;
-    excludeAgents?: string[];
-    logRedactions?: boolean;
-    http?: Omit<Partial<HttpBackendConfig>, "docker"> & {
-      docker?: Partial<DockerAutomationConfig>;
-    };
+/** Inner options (mode, http, …). */
+export type PluginConfigInner = {
+  mode?: RedactionMode;
+  excludeAgents?: string[];
+  logRedactions?: boolean;
+  http?: Omit<Partial<HttpBackendConfig>, "docker"> & {
+    docker?: Partial<DockerAutomationConfig>;
   };
+};
+
+/**
+ * Harness/tests often pass `{ enabled, config: { http, … } }`.
+ * OpenClaw passes `plugins.entries.<id>.config` as `api.pluginConfig` (flat `{ http, … }`, no `.config` wrapper).
+ */
+export interface PluginConfigInput extends Partial<PluginConfigInner> {
+  enabled?: boolean;
+  config?: PluginConfigInner;
 }
 
 export interface RedactApiAnalyzeRequest {
