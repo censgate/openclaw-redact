@@ -1,0 +1,7 @@
+*	@censgate-clara @censgate-coder @censgate-mark
+
+# Documentation
+*.md	@censgate-clara @censgate-coder @censgate-mark
+
+# CI/CD configuration
+.github/	@censgate-clara @censgate-coder @censgate-mark
