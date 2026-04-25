@@ -1,5 +1,15 @@
 # Security Policy
 
+## Reporting Security Vulnerabilities
+
+We take security seriously. If you discover a security vulnerability, please report it responsibly:
+
+1. **Email:** security@censgate.com
+2. **Do not** open a public GitHub issue for security vulnerabilities
+3. Include steps to reproduce, impact assessment, and any suggested fixes
+
+We aim to respond within 48 hours and will work with you to understand and resolve the issue.
+
 ## Supported Versions
 
 Security fixes are provided for the most recent minor release on the `main`
