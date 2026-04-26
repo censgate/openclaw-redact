@@ -8,15 +8,26 @@
   "files": [
     "dist",
     "openclaw.plugin.json",
+    "scripts/postinstall.mjs",
+    "scripts/sync-openclaw-plugin-version.mjs",
     "LICENSE",
     "README.md"
   ],
   "openclaw": {
     "extensions": [
       "./dist/openclaw-plugin.js"
-    ]
+    ],
+    "compat": {
+      "pluginApi": ">=2026.4.24",
+      "minGatewayVersion": "2026.4.24"
+    },
+    "build": {
+      "openclawVersion": "2026.4.24",
+      "pluginSdkVersion": "2026.4.24"
+    }
   },
   "scripts": {
+    "postinstall": "node scripts/postinstall.mjs",
     "build": "tsc",
     "clean": "make clean",
     "test": "vitest run",
