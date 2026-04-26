@@ -1,0 +1,39 @@
+name: Changesets
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  changesets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Align npm to 11.11.x
+        run: npm install -g npm@11.11.0
+
+      - name: Install dependencies
+        run: npm ci
+
+      - uses: changesets/action@v1
+        with:
+          version: npm run version-packages
+          title: "chore: version packages"
+          commit: "chore: version packages"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
