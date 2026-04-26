@@ -3,8 +3,9 @@ name: Changesets
 on:
   push:
     branches: [main]
-  pull_request:
 
+# Run only on main. On pull_request, changesets/action can hit GitHub
+# "base: invalid" when creating the version PR (merge ref / wrong base).
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
