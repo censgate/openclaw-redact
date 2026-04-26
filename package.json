@@ -29,8 +29,9 @@
     "lint:fix": "eslint src/ tests/ verification/ --fix",
     "typecheck": "tsc --noEmit",
     "changeset": "changeset",
-    "version-packages": "changeset version && npm install --package-lock-only --no-fund --no-audit",
-    "prepublishOnly": "npm run build"
+    "sync-plugin-version": "node scripts/sync-openclaw-plugin-version.mjs",
+    "version-packages": "changeset version && npm run sync-plugin-version && npm install --package-lock-only --no-fund --no-audit",
+    "prepublishOnly": "npm run sync-plugin-version && npm run build"
   },
   "keywords": [
     "openclaw",
