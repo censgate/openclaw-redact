@@ -12,7 +12,9 @@
     "README.md"
   ],
   "openclaw": {
-    "extensions": ["./dist/openclaw-plugin.js"]
+    "extensions": [
+      "./dist/openclaw-plugin.js"
+    ]
   },
   "scripts": {
     "build": "tsc",
@@ -26,6 +28,8 @@
     "lint": "eslint src/ tests/ verification/",
     "lint:fix": "eslint src/ tests/ verification/ --fix",
     "typecheck": "tsc --noEmit",
+    "changeset": "changeset",
+    "version-packages": "changeset version && npm install --package-lock-only --no-fund --no-audit",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
@@ -51,6 +55,7 @@
     "node": ">=22.14.0"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "@mariozechner/pi-agent-core": "^0.66.1",
     "@types/node": "^24.0.0",
     "@types/uuid": "^10.0.0",

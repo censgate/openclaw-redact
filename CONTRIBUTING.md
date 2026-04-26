@@ -33,6 +33,16 @@ npm run lint
 - Ensure all tests pass before submitting PR
 - Update documentation for API changes
 
+## Releases and versioning
+
+User-facing changes should include a [Changesets](https://github.com/changesets/changesets) entry so `CHANGELOG.md` and the npm version stay in sync:
+
+```bash
+npx changeset
+```
+
+Commit the new file under `.changeset/` with your PR. After merge to `main`, a **Version packages** PR is opened automatically; merging it bumps the version, creates a GitHub Release, and triggers npm publish.
+
 ## Pull Request Process
 
 1. Update the README.md with details of changes if applicable
