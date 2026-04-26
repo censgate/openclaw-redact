@@ -2,7 +2,7 @@
 
 # Default endpoint for host-run tests (docker-compose maps 8080:8080)
 REDACT_VERIFY_ENDPOINT ?= http://127.0.0.1:8080
-OPENCLAW_TAG ?= 2026.4.15
+OPENCLAW_TAG ?= 2026.4.24
 
 help:
 	@echo "Targets:"

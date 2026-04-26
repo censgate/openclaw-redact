@@ -19,7 +19,7 @@ Tier 2 is slower (Docker build/bring-up, one agent turn) and optional for day-to
 
 ### Tier 2 environment
 
-- **`OPENCLAW_TAG`** (default in `Makefile`: `2026.4.15`): OpenClaw image tag for `ghcr.io/openclaw/openclaw:<tag>`.
+- **`OPENCLAW_TAG`** (default in `Makefile`: `2026.4.24`): OpenClaw image tag for `ghcr.io/openclaw/openclaw:<tag>`.
 - **`OPENCLAW_GATEWAY_TOKEN`** (default in compose: `e2e-test-token`): must match gateway and CLI profile in `docker-compose.openclaw-e2e.yml`.
 - **`REDACT_VERIFY_ENDPOINT`**: tier-1 style; tier 2 still waits for Redact at `http://127.0.0.1:8080` from the host.
 
@@ -86,7 +86,7 @@ make verify-openclaw-e2e
 Pin the gateway image tag:
 
 ```bash
-make verify-openclaw-e2e OPENCLAW_TAG=2026.4.15
+make verify-openclaw-e2e OPENCLAW_TAG=2026.4.24
 ```
 
 Stop tier 2 without a full run:

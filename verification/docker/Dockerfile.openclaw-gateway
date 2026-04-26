@@ -1,6 +1,6 @@
 # Real OpenClaw image with censgate-redact installed from npm pack output.
 # OPENCLAW_TAG must match the CLI/runtime used for `openclaw plugins install` (see docs/VERIFICATION.md).
-ARG OPENCLAW_TAG=2026.4.15
+ARG OPENCLAW_TAG=2026.4.24
 FROM ghcr.io/openclaw/openclaw:${OPENCLAW_TAG}
 
 USER root

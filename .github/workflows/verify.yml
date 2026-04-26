@@ -60,4 +60,4 @@ jobs:
         env:
           REDACT_VERIFY_ENDPOINT: http://127.0.0.1:8080
           OPENCLAW_GATEWAY_URL: http://127.0.0.1:18789
-          OPENCLAW_TAG: 2026.4.15
+          OPENCLAW_TAG: 2026.4.24

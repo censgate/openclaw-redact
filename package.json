@@ -55,7 +55,7 @@
     "@types/node": "^24.0.0",
     "@types/uuid": "^10.0.0",
     "eslint": "^9.0.0",
-    "openclaw": "^2026.4.15",
+    "openclaw": "^2026.4.20",
     "tsx": "^4.0.0",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.0.0",
