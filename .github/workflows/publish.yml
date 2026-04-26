@@ -1,8 +1,13 @@
 name: Publish to npm
 
 on:
+  workflow_dispatch:
   release:
     types: [published]
+  workflow_call:
+    secrets:
+      NPM_TOKEN:
+        required: true
 
 permissions:
   contents: read
