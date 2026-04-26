@@ -7,7 +7,8 @@ const packageJsonPath = resolve(root, "package.json");
 const openclawInstalledPath = resolve(root, "node_modules/openclaw/package.json");
 const pluginPath = resolve(root, "openclaw.plugin.json");
 
-const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+const packageJsonText = readFileSync(packageJsonPath, "utf8");
+const pkg = JSON.parse(packageJsonText);
 const { version } = pkg;
 
 const pluginText = readFileSync(pluginPath, "utf8");
@@ -47,7 +48,6 @@ pkg.openclaw.build.openclawVersion = openclawVersion;
 pkg.openclaw.build.pluginSdkVersion = openclawVersion;
 
 const nextPackageJson = `${JSON.stringify(pkg, null, 2)}\n`;
-const currentPackageJson = readFileSync(packageJsonPath, "utf8");
-if (nextPackageJson !== currentPackageJson) {
+if (nextPackageJson !== packageJsonText) {
   writeFileSync(packageJsonPath, nextPackageJson, "utf8");
 }
