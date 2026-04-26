@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1
+
+### Patch Changes
+
+- a8ade12: Automate versioning and npm releases with Changesets, a version-packages PR workflow, and automatic GitHub Releases that trigger the existing npm publish action.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -12,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Initial open-source release.
 
 ### Added
+
 - OpenClaw plugin wrapping the [censgate/redact](https://github.com/censgate/redact)
   HTTP API for privacy-preserving LLM interactions.
 - `preLLMHook` that calls `POST /api/v1/analyze` on the Redact API and
