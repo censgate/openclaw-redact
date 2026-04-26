@@ -1,19 +1,20 @@
 name: Create GitHub Release
 
 # When the version on main changes (e.g. after the Changesets "Version packages" PR merges),
-# create a GitHub Release. We then call the publish workflow here because releases created with
-# the default GITHUB_TOKEN do not trigger other workflows (including release: published).
+# create a GitHub Release and publish to npm. We run publish in this same workflow (not
+# `on: release` in a separate run) because releases created with the default GITHUB_TOKEN
+# do not trigger other workflows, and a reusable `workflow_call` to the publish job can
+# fail to schedule when npm secrets/permissions are misconfigured.
 # See: https://docs.github.com/en/actions/using-workflows/triggering-a-workflow#triggering-a-workflow-from-a-workflow
 on:
   push:
     branches: [main]
 
-permissions:
-  contents: write
-
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       should_publish: ${{ steps.create.outputs.should_publish == 'true' }}
     steps:
@@ -60,9 +61,39 @@ jobs:
             --generate-notes
           echo "should_publish=true" >> "$GITHUB_OUTPUT"
 
-  publish:
+  npm-publish:
     needs: release
     if: needs.release.outputs.should_publish == 'true'
-    uses: ./.github/workflows/publish.yml
-    secrets:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

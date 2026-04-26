@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+### Patch Changes
+
+- Fix Create GitHub Release workflow by inlining the npm publish job so the release pipeline schedules reliably, and cut release 0.1.2.
+
 ## 0.1.1
 
 ### Patch Changes
@@ -38,5 +44,5 @@ Initial open-source release.
 - HTTP latency benchmark (`npm run benchmark`) and gateway benchmark
   (`npm run benchmark:openclaw-gateway`).
 
-[Unreleased]: https://github.com/censgate/openclaw-redact/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/censgate/openclaw-redact/compare/v0.1.2...HEAD
 [0.1.0]: https://github.com/censgate/openclaw-redact/releases/tag/v0.1.0
