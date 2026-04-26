@@ -1,7 +1,7 @@
 {
   "id": "censgate-redact",
   "name": "Censgate OpenClaw Redact",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Privacy-preserving PII redaction for LLM-bound text via censgate/redact HTTP API.",
   "providers": ["censgate-mock"],
   "extensions": ["./dist/openclaw-plugin.js"],
