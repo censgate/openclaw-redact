@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Move Docker-backed verification, OpenClaw gateway E2E, mock LLM, and benchmark tooling to `censgate/openclaw-redact-benchmark` so this source repository stays focused on the shipped plugin package.
+- Replace local extended verification docs with pointers to the benchmark repository.
+
 ## 0.1.3
 
 ### OpenClaw plugin registry and scanner alignment
