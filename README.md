@@ -174,43 +174,29 @@ npm run build
 npm test
 ```
 
-Clean build artifacts, pack tarballs, and verification output: `make clean` (or `npm run clean`).
+Clean build artifacts and pack tarballs: `make clean` (or `npm run clean`).
 
 ## Testing & verification
 
-The verification, compose, and benchmark assets are development/release tooling only. They remain in the source repository for auditability but are not shipped in the npm runtime package.
-
-**Tier 1** — fast hook harness against a Dockerized **censgate/redact** API (no external LLM):
+This repository keeps package-local checks only:
 
 ```bash
-make verify
+npm run build
+npm run typecheck
+npm run lint
+npm test
 ```
 
-Produces `verification-report.json` (gitignored); config in `vitest.verification.config.ts`.
-
-**Tier 2** — optional OpenClaw **gateway** in Docker with this plugin, mock OpenAI-compatible LLM, and an agent turn:
-
-```bash
-make verify-openclaw-e2e
-```
-
-Set `OPENCLAW_TAG` to pin the gateway image (see `Makefile`). Details: [docs/VERIFICATION.md](docs/VERIFICATION.md). Human-review samples: `verification/samples/`.
+Docker-backed Redact verification, OpenClaw gateway E2E tests, mock LLM fixtures,
+and latency benchmarks live in
+[`censgate/openclaw-redact-benchmark`](https://github.com/censgate/openclaw-redact-benchmark).
+See [docs/VERIFICATION.md](docs/VERIFICATION.md) for details.
 
 ## Latency benchmark
 
-With Redact running in Docker (e.g. `docker run --rm -p 8080:8080 ghcr.io/censgate/redact:full`):
-
-```bash
-npm run benchmark
-```
-
-Optional: `REDACT_API_ENDPOINT`, `BENCH_ITERATIONS`, `BENCH_WARMUP`, `BENCH_TEXT`.
-
-**Gateway benchmark (tier 2):** when the tier-2 stack from `docker-compose.openclaw-e2e.yml` is up:
-
-```bash
-OPENCLAW_BENCHMARK=1 npm run benchmark:openclaw-gateway
-```
+Latency probes are maintained in
+[`censgate/openclaw-redact-benchmark`](https://github.com/censgate/openclaw-redact-benchmark)
+so the published plugin source remains focused on runtime code.
 
 ## Documentation
 
