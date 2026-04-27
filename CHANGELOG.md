@@ -1,5 +1,30 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+## 0.1.3
+
+### OpenClaw plugin registry and scanner alignment
+
+- Expand `configSchema` in `openclaw.plugin.json` and keep it in sync with the runtime Zod model via `src/config-schema.ts` and `scripts/sync-openclaw-plugin-json-schema.mjs`, so the OpenClaw plugin registry and automated scans see the same configuration shape as the shipped plugin. Optional `REDACT_*` environment overrides are documented in the published schema description.
+
+### Changed
+
+- Clarify in README and SECURITY that reversible mode keeps originals in unencrypted per-turn memory and that undocumented env vars such as `REDACT_ENCRYPTION_KEY` / `REDACT_PERFORMANCE_MODE` are not read by this plugin.
+- Make Docker auto-start opt-in by default so the plugin does not perform host-mutating Docker operations unless explicitly configured.
+- Clarify that verification and benchmark assets are development or release tooling and are not included in the npm package.
+
+### Removed
+
+- Remove stale root `PRD.md` that described unimplemented encryption and performance environment variables.
+- Remove the npm `postinstall` hook and its script so `npm install` of this package does not run repository sync commands.
+- Remove the source-linked example verification report that embedded localhost URL data.
+
 ## 0.1.2
 
 ### Patch Changes
@@ -11,26 +36,6 @@
 ### Patch Changes
 
 - a8ade12: Automate versioning and npm releases with Changesets, a version-packages PR workflow, and automatic GitHub Releases that trigger the existing npm publish action.
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
-### Changed
-
-- Expand `openclaw.plugin.json` / runtime `configSchema` (Zod + `scripts/sync-openclaw-plugin-json-schema.mjs`) so registry metadata lists the real config shape and documents optional `REDACT_*` env overrides.
-- Clarify in README and SECURITY that reversible mode keeps originals in unencrypted per-turn memory and that undocumented env vars such as `REDACT_ENCRYPTION_KEY` / `REDACT_PERFORMANCE_MODE` are not used.
-- Make Docker auto-start opt-in by default so the plugin no longer attempts host-mutating Docker operations unless explicitly configured.
-- Clarify that verification and benchmark assets are development/release tooling and are not shipped in the npm runtime package.
-
-### Removed
-
-- Remove stale root `PRD.md` that described unimplemented encryption and performance env vars.
-- Remove the npm `postinstall` hook and its script so package installation does not run project sync commands.
-- Remove the source-linked example verification report that used localhost URL data.
 
 ## [0.1.0] - 2026-04-22
 
@@ -57,5 +62,6 @@ Initial open-source release.
 - HTTP latency benchmark (`npm run benchmark`) and gateway benchmark
   (`npm run benchmark:openclaw-gateway`).
 
-[Unreleased]: https://github.com/censgate/openclaw-redact/compare/v0.1.2...HEAD
+[Unreleased]: https://github.com/censgate/openclaw-redact/compare/v0.1.3...HEAD
+[0.1.3]: https://github.com/censgate/openclaw-redact/compare/v0.1.2...v0.1.3
 [0.1.0]: https://github.com/censgate/openclaw-redact/releases/tag/v0.1.0
