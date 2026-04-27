@@ -19,6 +19,9 @@ npm install
 # Build the plugin
 npm run build
 
+# Refresh openclaw.plugin.json configSchema after changing src/config-schema.ts
+npm run sync-plugin-json-schema
+
 # Run tests
 npm test
 

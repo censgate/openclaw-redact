@@ -8,8 +8,8 @@
   "files": [
     "dist",
     "openclaw.plugin.json",
-    "scripts/postinstall.mjs",
     "scripts/sync-openclaw-plugin-version.mjs",
+    "scripts/sync-openclaw-plugin-json-schema.mjs",
     "LICENSE",
     "README.md"
   ],
@@ -27,7 +27,6 @@
     }
   },
   "scripts": {
-    "postinstall": "node scripts/postinstall.mjs",
     "build": "tsc",
     "clean": "make clean",
     "test": "vitest run",
@@ -42,7 +41,8 @@
     "changeset": "changeset",
     "sync-plugin-version": "node scripts/sync-openclaw-plugin-version.mjs",
     "version-packages": "changeset version && npm run sync-plugin-version && npm install --package-lock-only --no-fund --no-audit",
-    "prepublishOnly": "npm run sync-plugin-version && npm run build"
+    "prepublishOnly": "npm run sync-plugin-version && npm run build && node scripts/sync-openclaw-plugin-json-schema.mjs",
+    "sync-plugin-json-schema": "node scripts/sync-openclaw-plugin-json-schema.mjs"
   },
   "keywords": [
     "openclaw",
@@ -79,7 +79,8 @@
     "vitest": "^3.0.0"
   },
   "dependencies": {
-    "uuid": "^14.0.0"
+    "uuid": "^14.0.0",
+    "zod": "^4.3.6"
   },
   "overrides": {
     "axios": "^1.15.0",

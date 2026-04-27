@@ -7,7 +7,7 @@ import type {
 } from "./types.js";
 
 const DEFAULT_DOCKER_CONFIG: DockerAutomationConfig = {
-  enabled: parseBoolean(process.env.REDACT_DOCKER_AUTOSTART, true),
+  enabled: parseBoolean(process.env.REDACT_DOCKER_AUTOSTART, false),
   image: process.env.REDACT_DOCKER_IMAGE ?? "ghcr.io/censgate/redact:full",
   containerName: process.env.REDACT_DOCKER_CONTAINER_NAME ?? "openclaw-redact-api",
   host: process.env.REDACT_DOCKER_HOST ?? "127.0.0.1",

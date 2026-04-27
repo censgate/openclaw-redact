@@ -21,8 +21,8 @@ OpenClaw plugin that calls the Rust **Redact HTTP API** on the LLM path and rest
 
 - **Engine-backed** — Detection and policy live in [censgate/redact](https://github.com/censgate/redact) (`redact-api`), not duplicated in TypeScript
 - **HTTP only** — No bundled regex/ML; you point the plugin at a Redact API (local or remote)
-- **Sensible defaults** — Reversible redaction, Docker-backed Redact auto-start with `ghcr.io/censgate/redact:full`, dynamic host port by default
-- **Self-healing** — If the API is down at first use, the plugin can start or reuse a container, discover the mapped port, and retry
+- **Sensible defaults** — Reversible redaction against a configured or local Redact API endpoint
+- **Opt-in Docker helper** — For trusted local development, the plugin can start or reuse `ghcr.io/censgate/redact:full`, discover the mapped port, and retry
 - **OpenClaw-native** — `preLLMHook` / `postLLMHook` integration with per-turn token storage for restore
 
 This package does **not** implement local pattern matching. It wraps the upstream engine and applies redaction/restoration in OpenClaw hooks.
@@ -31,8 +31,8 @@ This package does **not** implement local pattern matching. It wraps the upstrea
 
 - **Node.js** [>= 22.14.0](https://nodejs.org/) (see `engines` in `package.json`)
 - **OpenClaw** with plugin support, compatible with this package’s OpenClaw peer range
-- **Docker** (recommended for the default “zero config” path) to auto-run the [Redact full image](https://github.com/censgate/redact) (`ghcr.io/censgate/redact:full`) with ONNX-capable NER
-- **Alternative:** run Redact yourself (e.g. `docker run` or a hosted `redact-api`) and set `REDACT_API_ENDPOINT` or `http.endpoint` if not using the default
+- A running Redact HTTP API. For local development, start the [Redact full image](https://github.com/censgate/redact) (`ghcr.io/censgate/redact:full`) with ONNX-capable NER, or point the plugin at a hosted `redact-api` using `REDACT_API_ENDPOINT` / `http.endpoint`.
+- **Optional:** Docker, only if you explicitly enable the plugin's Docker auto-start helper for a trusted local environment.
 
 ## Quick start
 
@@ -42,9 +42,9 @@ This package does **not** implement local pattern matching. It wraps the upstrea
 openclaw plugins install @censgate/openclaw-redact
 ```
 
-**2. Use defaults — no `openclaw.json` block required** for a typical local setup.
+**2. Start or configure Redact**
 
-By default the plugin is enabled, uses **reversible** redaction, and (with Docker available) will **auto-start** the Redact API container `ghcr.io/censgate/redact:full`, map a **free host port**, and call that endpoint. The default logical endpoint is `http://127.0.0.1:8080` until a dynamic port is resolved after bootstrap.
+By default the plugin is enabled, uses **reversible** redaction, and calls `http://127.0.0.1:8080`. Start Redact yourself or set `REDACT_API_ENDPOINT` / `http.endpoint` to an existing trusted Redact API.
 
 **3. Optional — if you use a plugin allowlist**, allow the plugin id and ensure it is enabled:
 
@@ -59,12 +59,14 @@ By default the plugin is enabled, uses **reversible** redaction, and (with Docke
 }
 ```
 
-**Manual Redact (no auto-start):** if you do not use Docker, start the API yourself, then align the endpoint:
+**Local Redact with Docker:** start the API yourself, then align the endpoint:
 
 ```bash
 docker run --rm -p 8080:8080 ghcr.io/censgate/redact:full
 # Plugin defaults expect http://127.0.0.1:8080 (or set REDACT_API_ENDPOINT).
 ```
+
+**Optional auto-start:** in trusted local development only, enable Docker auto-start with `REDACT_DOCKER_AUTOSTART=true` or `http.docker.enabled: true`.
 
 ## Installation
 
@@ -77,13 +79,15 @@ Package id in OpenClaw: **`censgate-redact`** (see `openclaw.plugin.json`).
 
 - **Protocol:** HTTP only to Redact’s REST API
 - **Engine:** `redact-api` from [censgate/redact](https://github.com/censgate/redact)
-- **Recommended image (pattern + ONNX NER):** `ghcr.io/censgate/redact:full` — used by the plugin’s default Docker auto-start
+- **Recommended image (pattern + ONNX NER):** `ghcr.io/censgate/redact:full` — used by manual Docker runs and the opt-in Docker auto-start helper
 
 ## How it works
 
 1. `preLLMHook` calls `POST /api/v1/analyze` on the Redact API.
 2. Detected spans are replaced with `[REDACTED:<ENTITY_TYPE>:<id>]` placeholders in **reversible** mode (or non-reversible placeholders in **irreversible** mode).
 3. `postLLMHook` restores reversible placeholders using per-turn token storage.
+
+**Reversible mode and memory:** Restoration uses an in-memory map from placeholder to original substring for the current turn. The plugin does **not** encrypt those token entries or persist them to disk. Any process with access to the OpenClaw gateway memory could read them while they exist. For workflows where placeholders must not be reversible, use `mode: "irreversible"`.
 
 ## Configuration
 
@@ -92,13 +96,12 @@ Package id in OpenClaw: **`censgate-redact`** (see `openclaw.plugin.json`).
 With no custom config, the plugin typically:
 
 - Stays **enabled**; **reversible** mode; no agent exclude list; redaction logging off
-- Uses **Docker-backed Redact auto-start** (unless disabled via env or config)
-- Pulls the **full** image by default: `ghcr.io/censgate/redact:full`
-- Assigns a **dynamic host port** when `hostPort` is unset (avoids collisions)
-- **Retries** and may **restart** the container on failure, per `resolveConfig` / Docker bootstrap behavior
+- Calls the configured Redact HTTP API endpoint, defaulting to `http://127.0.0.1:8080`
+- Leaves Docker auto-start **disabled** unless explicitly enabled via env or config
+- Keeps the Docker helper defaults available when opted in: image `ghcr.io/censgate/redact:full`, dynamic host port when `hostPort` is unset, and restart-on-failure behavior
 - Leaves **`entityTypes` unset** so Redact applies its full built-in recognizer set (broad PII / HIPAA / GDPR–oriented coverage)
 
-### When Docker auto-start is on
+### When Docker auto-start is explicitly enabled
 
 - The plugin attempts a Redact API call first.
 - If unreachable, it auto-starts or reuses the container, detects the mapped host port (including dynamic assignment), updates the runtime endpoint, and retries.
@@ -106,7 +109,7 @@ With no custom config, the plugin typically:
 
 ### Advanced / production (optional)
 
-For sustained load, pin a stable host port, raise timeouts, and optionally pre-pull the image. Example:
+For sustained load, use an existing Redact endpoint, pin a stable host port if using Docker, raise timeouts, and optionally pre-pull the image. Example:
 
 ```json
 {
@@ -146,11 +149,13 @@ For sustained load, pin a stable host port, raise timeouts, and optionally pre-p
 
 ## Environment variables
 
+All variables below are **optional** configuration overrides. **None are required** for the plugin to run with defaults, and none are cloud or provider credentials. The plugin **does not** read `REDACT_ENCRYPTION_KEY`, `REDACT_PERFORMANCE_MODE`, or other undocumented `REDACT_*` names.
+
 | Variable | Role |
 |----------|------|
 | `REDACT_API_ENDPOINT` | Redact base URL (default: `http://127.0.0.1:8080`) |
 | `REDACT_ENTITY_TYPES` | Comma-separated entity filter (optional) |
-| `REDACT_DOCKER_AUTOSTART` | `true\|false` (default: `true`) |
+| `REDACT_DOCKER_AUTOSTART` | `true\|false` (default: `false`) |
 | `REDACT_DOCKER_IMAGE` | Default: `ghcr.io/censgate/redact:full` |
 | `REDACT_DOCKER_CONTAINER_NAME` | Default: `openclaw-redact-api` |
 | `REDACT_DOCKER_HOST` | Default: `127.0.0.1` |
@@ -172,6 +177,8 @@ npm test
 Clean build artifacts, pack tarballs, and verification output: `make clean` (or `npm run clean`).
 
 ## Testing & verification
+
+The verification, compose, and benchmark assets are development/release tooling only. They remain in the source repository for auditability but are not shipped in the npm runtime package.
 
 **Tier 1** — fast hook harness against a Dockerized **censgate/redact** API (no external LLM):
 

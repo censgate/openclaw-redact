@@ -73,8 +73,16 @@ Out of scope (please report upstream):
 - The plugin sends request payloads to the configured Redact endpoint. Run
   Redact on a trusted network path (loopback or a private network); do not
   point the plugin at an untrusted endpoint.
+- Docker auto-start is disabled by default. If you enable it with
+  `REDACT_DOCKER_AUTOSTART=true` or `http.docker.enabled: true`, the plugin may
+  run Docker commands to start, reuse, inspect, or restart a Redact container.
+  Use it only in trusted local environments.
 - `logRedactions: true` may write detected PII to logs. Leave it disabled in
   production unless you have a compliant log sink.
 - Reversible mode stores the mapping from placeholders back to original
-  values in per-turn memory. Ensure your OpenClaw runtime does not persist
-  this memory to untrusted storage.
+  values in per-turn **process memory** only. The plugin does **not** encrypt
+  those token entries and does **not** read a `REDACT_ENCRYPTION_KEY` (or
+  similar) for them. Treat the gateway process like any other component that
+  may briefly hold sensitive substrings in RAM. Use `mode: "irreversible"`
+  when restoration must not be possible. Ensure your OpenClaw runtime does not
+  persist this memory to untrusted storage.

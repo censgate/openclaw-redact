@@ -3,30 +3,250 @@
   "name": "Censgate OpenClaw Redact",
   "version": "0.1.2",
   "description": "Privacy-preserving PII redaction for LLM-bound text via censgate/redact HTTP API.",
-  "providers": ["censgate-mock"],
-  "extensions": ["./dist/openclaw-plugin.js"],
+  "providers": [
+    "censgate-mock"
+  ],
+  "extensions": [
+    "./dist/openclaw-plugin.js"
+  ],
   "configSchema": {
     "jsonSchema": {
+      "description": "OpenClaw plugins.entries.censgate-redact shape. No required environment variables. Optional REDACT_* overrides: REDACT_API_ENDPOINT, REDACT_ENTITY_TYPES, REDACT_DOCKER_AUTOSTART, REDACT_DOCKER_IMAGE, REDACT_DOCKER_CONTAINER_NAME, REDACT_DOCKER_HOST, REDACT_DOCKER_HOST_PORT, REDACT_DOCKER_CONTAINER_PORT, REDACT_DOCKER_PULL, REDACT_DOCKER_RESTART_ON_FAILURE, REDACT_DOCKER_STARTUP_TIMEOUT_MS, REDACT_DOCKER_STARTUP_PROBE_INTERVAL_MS. Docker auto-start is disabled by default and must be explicitly enabled. This plugin does not read REDACT_ENCRYPTION_KEY or REDACT_PERFORMANCE_MODE.",
       "type": "object",
-      "additionalProperties": true,
       "properties": {
-        "enabled": { "type": "boolean" },
+        "enabled": {
+          "type": "boolean"
+        },
         "config": {
           "type": "object",
-          "additionalProperties": true,
           "properties": {
             "mode": {
               "type": "string",
-              "enum": ["reversible", "irreversible", "audit-only"]
+              "enum": [
+                "reversible",
+                "irreversible",
+                "audit-only"
+              ]
             },
             "excludeAgents": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             },
-            "logRedactions": { "type": "boolean" },
-            "http": { "type": "object", "additionalProperties": true }
+            "logRedactions": {
+              "type": "boolean"
+            },
+            "http": {
+              "type": "object",
+              "properties": {
+                "endpoint": {
+                  "type": "string"
+                },
+                "timeoutMs": {
+                  "type": "number"
+                },
+                "language": {
+                  "type": "string"
+                },
+                "entityTypes": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "headers": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "string"
+                  }
+                },
+                "docker": {
+                  "type": "object",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "image": {
+                      "type": "string"
+                    },
+                    "containerName": {
+                      "type": "string"
+                    },
+                    "host": {
+                      "type": "string"
+                    },
+                    "hostPort": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "containerPort": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "pull": {
+                      "type": "boolean"
+                    },
+                    "restartOnFailure": {
+                      "type": "boolean"
+                    },
+                    "startupTimeoutMs": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "startupProbeIntervalMs": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "additionalProperties": {}
+                }
+              },
+              "additionalProperties": {}
+            }
+          },
+          "additionalProperties": {}
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "reversible",
+            "irreversible",
+            "audit-only"
+          ]
+        },
+        "excludeAgents": {
+          "type": "array",
+          "items": {
+            "type": "string"
           }
+        },
+        "logRedactions": {
+          "type": "boolean"
+        },
+        "http": {
+          "type": "object",
+          "properties": {
+            "endpoint": {
+              "type": "string"
+            },
+            "timeoutMs": {
+              "type": "number"
+            },
+            "language": {
+              "type": "string"
+            },
+            "entityTypes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headers": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              }
+            },
+            "docker": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean"
+                },
+                "image": {
+                  "type": "string"
+                },
+                "containerName": {
+                  "type": "string"
+                },
+                "host": {
+                  "type": "string"
+                },
+                "hostPort": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "containerPort": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "pull": {
+                  "type": "boolean"
+                },
+                "restartOnFailure": {
+                  "type": "boolean"
+                },
+                "startupTimeoutMs": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                "startupProbeIntervalMs": {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                }
+              },
+              "additionalProperties": {}
+            }
+          },
+          "additionalProperties": {}
         }
+      },
+      "additionalProperties": {}
+    },
+    "uiHints": {
+      "mode": {
+        "label": "Redaction mode",
+        "help": "reversible: restore placeholders after the model runs; irreversible: no restoration; audit-only: detection path only."
+      },
+      "excludeAgents": {
+        "label": "Exclude agents",
+        "help": "Agent ids that skip redaction when configured in the plugin runtime.",
+        "advanced": true
+      },
+      "logRedactions": {
+        "label": "Log redactions",
+        "help": "May log sensitive content; keep off in production unless the sink is compliant.",
+        "advanced": true
+      },
+      "http.endpoint": {
+        "label": "Redact API base URL",
+        "help": "Overrides REDACT_API_ENDPOINT (default http://127.0.0.1:8080)."
+      },
+      "http.timeoutMs": {
+        "label": "HTTP timeout (ms)",
+        "advanced": true
+      },
+      "http.language": {
+        "label": "Analyze language",
+        "advanced": true
+      },
+      "http.entityTypes": {
+        "label": "Entity types",
+        "help": "Optional filter; mirrors comma-separated REDACT_ENTITY_TYPES.",
+        "advanced": true
+      },
+      "http.headers": {
+        "label": "Extra HTTP headers",
+        "advanced": true
+      },
+      "http.docker.enabled": {
+        "label": "Docker auto-start",
+        "help": "Opt-in only. When true, may run Docker to start the Redact container. Overrides REDACT_DOCKER_AUTOSTART.",
+        "advanced": true
+      },
+      "http.docker.image": {
+        "label": "Docker image",
+        "help": "Overrides REDACT_DOCKER_IMAGE.",
+        "advanced": true
       }
     }
   }
