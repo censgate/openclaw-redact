@@ -19,6 +19,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Expand `openclaw.plugin.json` / runtime `configSchema` (Zod + `scripts/sync-openclaw-plugin-json-schema.mjs`) so registry metadata lists the real config shape and documents optional `REDACT_*` env overrides.
+- Clarify in README and SECURITY that reversible mode keeps originals in unencrypted per-turn memory and that undocumented env vars such as `REDACT_ENCRYPTION_KEY` / `REDACT_PERFORMANCE_MODE` are not used.
+- Make Docker auto-start opt-in by default so the plugin no longer attempts host-mutating Docker operations unless explicitly configured.
+- Clarify that verification and benchmark assets are development/release tooling and are not shipped in the npm runtime package.
+
+### Removed
+
+- Remove stale root `PRD.md` that described unimplemented encryption and performance env vars.
+- Remove the npm `postinstall` hook and its script so package installation does not run project sync commands.
+- Remove the source-linked example verification report that used localhost URL data.
+
 ## [0.1.0] - 2026-04-22
 
 Initial open-source release.

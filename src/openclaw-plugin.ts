@@ -1,4 +1,4 @@
-import { definePluginEntry, emptyPluginConfigSchema } from "openclaw/plugin-sdk/plugin-entry";
+import { definePluginEntry } from "openclaw/plugin-sdk/plugin-entry";
 import type {
   OpenClawPluginApi,
   ProviderWrapStreamFnContext,
@@ -6,6 +6,7 @@ import type {
 import { OpenClawRedactPlugin } from "./plugin.js";
 import type { PluginConfigInput, RedactionToken } from "./types.js";
 import { resolveConfig } from "./config.js";
+import { censgateRedactPluginConfigSchema } from "./config-schema.js";
 import { restore } from "./restorer.js";
 import { redact } from "./redactor.js";
 
@@ -140,7 +141,7 @@ export default definePluginEntry({
   name: "Censgate OpenClaw Redact",
   description:
     "Privacy-preserving redaction for LLM-bound text via the censgate/redact HTTP API.",
-  configSchema: emptyPluginConfigSchema(),
+  configSchema: censgateRedactPluginConfigSchema,
   register(api) {
     const raw = (api.pluginConfig ?? {}) as PluginConfigInput;
     const resolved = resolveConfig(raw);

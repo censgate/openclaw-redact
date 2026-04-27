@@ -2,6 +2,8 @@
 
 This repository includes **two** verification tiers for `@censgate/openclaw-redact`. Both use a running **censgate/redact** HTTP API and **no** OpenRouter or other external LLM services.
 
+These assets are for development and release verification only. The npm runtime package is limited by `package.json#files` and does not ship this document, compose files, verification tests, sample fixtures, or benchmark scripts.
+
 ## Tier 1 vs tier 2
 
 | Tier | Command | What it proves |
@@ -36,7 +38,7 @@ Or `npm run benchmark:openclaw-gateway` after exporting `OPENCLAW_BENCHMARK=1`. 
 ## What is (and is not) covered
 
 - **In scope**: Hook harness (`preLLMHook` → mock LLM → `postLLMHook`, `toolCallHook`) against a real Redact container; PII leakage heuristics on LLM-bound strings; API response shape checks; edge cases (nested JSON, unicode, adversarial prompts, large payloads, concurrency); verification-side audit hash chain; `verification-report.json` with ENG-56 target metrics.
-- **Out of scope** (per ENG-56): performance benchmarking as a product gate, penetration testing, cloud deployment testing, production audit-log / hash-chain parity (see PRD-A note below).
+- **Out of scope** (per ENG-56): performance benchmarking as a product gate, penetration testing, cloud deployment testing, production audit-log / hash-chain parity (tracked separately from this plugin repo).
 
 Tier 1 **does not** embed a full OpenClaw gateway; it exercises the same plugin hooks a gateway would call. Tier 2 runs the **official** gateway image with the plugin installed inside the image (`openclaw plugins install` from the packed tarball).
 
@@ -113,4 +115,4 @@ Structured before/after examples for manual inspection live in [`../verification
 
 ## Production audit logs
 
-Structured production audit streams and cryptographic log chaining are **not** implemented in the plugin today. This suite records a **verification-only** hash chain in [`verification/harness/auditChain.ts`](../verification/harness/auditChain.ts). For platform-level audit expansion, see PRD references in Linear ENG-56.
+Structured production audit streams and cryptographic log chaining are **not** implemented in the plugin today. This suite records a **verification-only** hash chain in [`verification/harness/auditChain.ts`](../verification/harness/auditChain.ts). For platform-level audit expansion, see internal tracking (e.g. Linear ENG-56).

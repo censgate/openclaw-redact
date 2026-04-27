@@ -16,6 +16,7 @@ describe("OpenClawRedactPlugin", () => {
 
   afterEach(() => {
     fetchMock.mockReset();
+    vi.unstubAllEnvs();
   });
 
   it("creates with default config", () => {
@@ -266,13 +267,23 @@ describe("OpenClawRedactPlugin", () => {
 });
 
 describe("default config posture", () => {
-  it("defaults to resilient docker + full image + broad entity coverage", () => {
+  it("defaults to existing Redact API + opt-in docker + broad entity coverage", () => {
     const config = resolveConfig();
-    expect(config.config.http.docker?.enabled).toBe(true);
+    expect(config.config.http.docker?.enabled).toBe(false);
     expect(config.config.http.docker?.image).toBe("ghcr.io/censgate/redact:full");
     expect(config.config.http.docker?.restartOnFailure).toBe(true);
-    expect(config.config.http.hostPort).toBeUndefined();
+    expect(config.config.http.docker?.hostPort).toBeUndefined();
     expect(config.config.http.entityTypes).toBeUndefined();
+  });
+
+  it("enables docker auto-start when REDACT_DOCKER_AUTOSTART is true", async () => {
+    vi.stubEnv("REDACT_DOCKER_AUTOSTART", "true");
+    vi.resetModules();
+    const { resolveConfig: resolveConfigWithEnv } = await import(
+      "../src/config.js"
+    );
+    const config = resolveConfigWithEnv();
+    expect(config.config.http.docker?.enabled).toBe(true);
   });
 });
 
