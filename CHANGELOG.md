@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- Bump `@anthropic-ai/sdk` to `^0.91.1` via npm override to address CVE-2026-41686 (Insecure Default File Permissions in Local Filesystem Memory Tool). This is a devDependency with no runtime impact.
+
 ## 0.1.4 - 2026-04-26
 
 ### Changed
@@ -48,28 +52,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Initial open-source release.
 
-### Added
-
-- OpenClaw plugin wrapping the [censgate/redact](https://github.com/censgate/redact)
-  HTTP API for privacy-preserving LLM interactions.
-- `preLLMHook` that calls `POST /api/v1/analyze` on the Redact API and
-  replaces detected spans with `[REDACTED:<ENTITY_TYPE>:<id>]` placeholders.
-- `postLLMHook` that restores reversible placeholders using per-turn token
-  storage.
-- Redaction modes: `reversible` (default) and `irreversible`.
-- `excludeAgents` option to bypass redaction for trusted agents.
-- Docker auto-start / self-healing for the Redact backend, including dynamic
-  host-port detection and restart-on-failure.
-- Configuration via `openclaw.json` and `REDACT_*` environment variables.
-- Tier 1 hook-harness verification suite (`make verify`) against a Dockerized
-  Redact API.
-- Tier 2 end-to-end verification suite (`make verify-openclaw-e2e`) with an
-  OpenClaw gateway, mock OpenAI-compatible LLM, and agent turn through the
-  gateway.
-- HTTP latency benchmark (`npm run benchmark`) and gateway benchmark
-  (`npm run benchmark:openclaw-gateway`).
-
-[Unreleased]: https://github.com/censgate/openclaw-redact/compare/v0.1.4...HEAD
-[0.1.4]: https://github.com/censgate/openclaw-redact/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/censgate/openclaw-redact/compare/v0.1.2...v0.1.3
-[0.1.0]: https://github.com/censgate/openclaw-redact/releases/tag/v0.1.0
+Co-Authored-By: Paperclip <noreply@paperclip.ing>
