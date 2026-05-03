@@ -8,8 +8,6 @@ on:
     secrets:
       NPM_TOKEN:
         required: true
-      CLAWHUB_TOKEN:
-        required: true
 
 permissions:
   contents: read
@@ -48,21 +46,3 @@ jobs:
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-      - name: Install clawhub CLI
-        if: env.CLAWHUB_TOKEN != ''
-        run: npm install -g clawhub
-
-      - name: Login to ClawHub
-        if: env.CLAWHUB_TOKEN != ''
-        run: clawhub login --token $CLAWHUB_TOKEN --no-browser
-        env:
-          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
-
-      - name: Publish to ClawHub
-        if: env.CLAWHUB_TOKEN != ''
-        run: |
-          clawhub package publish . --dry-run
-          clawhub package publish .
-        env:
-          CLAWHUB_DISABLE_TELEMETRY: 1
