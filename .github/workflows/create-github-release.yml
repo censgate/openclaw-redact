@@ -104,7 +104,17 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+    env:
+      CLAWHUB_DISABLE_TELEMETRY: 1
+      HAS_CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN != '' }}
     steps:
+      - name: Check ClawHub token
+        run: |
+          if [ "$HAS_CLAWHUB_TOKEN" != "true" ]; then
+            echo "CLAWHUB_TOKEN not configured — skipping ClawHub publish"
+            exit 0
+          fi
+
       - uses: actions/checkout@v4
 
       - name: Use Node.js 24
@@ -132,4 +142,4 @@ jobs:
           clawhub package publish . --dry-run
           clawhub package publish .
         env:
-          CLAWHUB_DISABLE_TELEMETRY: 1
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
