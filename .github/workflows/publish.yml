@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish
 
 on:
   workflow_dispatch:
@@ -42,7 +42,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish
+      - name: Publish to npm
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -97,3 +97,56 @@ jobs:
         run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  clawhub-publish:
+    needs: release
+    if: needs.release.outputs.should_publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      CLAWHUB_DISABLE_TELEMETRY: 1
+      HAS_CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN != '' }}
+    steps:
+      - name: Check ClawHub token
+        run: |
+          if [ "$HAS_CLAWHUB_TOKEN" != "true" ]; then
+            echo "CLAWHUB_TOKEN not configured — skipping ClawHub publish"
+            exit 0
+          fi
+
+      - uses: actions/checkout@v4
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        run: npm ci
+
+      - name: Build
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        run: npm run build
+
+      - name: Install clawhub CLI
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        run: npm install -g clawhub
+
+      - name: Login to ClawHub
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        run: clawhub login --token "$CLAWHUB_TOKEN" --no-browser
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+
+      - name: Publish to ClawHub
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        run: |
+          clawhub package publish . --dry-run
+          clawhub package publish .
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
