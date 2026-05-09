@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Security
 
 - Bump `@anthropic-ai/sdk` to `^0.91.1` via npm override to address CVE-2026-41686 (Insecure Default File Permissions in Local Filesystem Memory Tool). This is a devDependency with no runtime impact.
+- Add npm overrides for `fast-uri` (^3.1.2) to address GHSA-v39h-62p7-jpjc / CVE-2026-6322 (host confusion via percent-encoded authority delimiters).
+- Add npm overrides for `fast-xml-builder` (^1.1.7) to address GHSA-xq4p-q4h5-j25r / CVE-2026-44665 (attribute values with unwanted quotes bypassing validation).
+
+Both are transitive devDependencies with no production code impact.
 
 ## 0.1.4 - 2026-04-26
 
