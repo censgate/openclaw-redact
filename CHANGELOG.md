@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6
+
+### Patch Changes
+
+- 230185f: Security fixes for medium CVEs via dependabot updates
+
 ## 0.1.5
 
 ### Patch Changes
@@ -23,6 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add npm overrides for `fast-xml-builder` (^1.1.7) to address GHSA-xq4p-q4h5-j25r / CVE-2026-44665 (attribute values with unwanted quotes bypassing validation).
 
 Both are transitive devDependencies with no production code impact.
+
 - Add npm overrides for `hono` (^4.12.18) to address CVE-2026-44458, CVE-2026-44457, CVE-2026-44455, CVE-2026-44459 (CSS injection, cache leakage, HTML injection, JWT validation).
 - Add npm overrides for `ip-address` (^10.1.2) to address CVE-2026-42338 (XSS via Address6 HTML methods).
 
