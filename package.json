@@ -82,11 +82,16 @@
     "fast-xml-parser": "^5.7.0",
     "fast-xml-builder": "^1.1.7",
     "fast-uri": "^3.1.2",
+    "hono": "^4.12.18",
+    "ip-address": "^10.1.2",
     "postcss": "^8.5.10",
     "protobufjs": "^7.5.5",
     "tar": "^7.5.11",
     "uuid": "^14.0.0",
-    "@anthropic-ai/sdk": "^0.91.1"
+    "@anthropic-ai/sdk": "^0.91.1",
+    "@mariozechner/pi-agent-core": {
+      "hono": "^4.12.18"
+    }
   },
   "publishConfig": {
     "access": "public"
