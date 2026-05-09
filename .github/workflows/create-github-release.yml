@@ -133,6 +133,10 @@ jobs:
         if: env.HAS_CLAWHUB_TOKEN == 'true'
         run: npm run build
 
+      - name: Build ClawPack
+        if: env.HAS_CLAWHUB_TOKEN == 'true'
+        run: npm pack --pack-destination ./dist/
+
       - name: Install clawhub CLI
         if: env.HAS_CLAWHUB_TOKEN == 'true'
         run: npm install -g clawhub
@@ -146,7 +150,7 @@ jobs:
       - name: Publish to ClawHub
         if: env.HAS_CLAWHUB_TOKEN == 'true'
         run: |
-          clawhub package publish . --dry-run
-          clawhub package publish .
+          clawhub package publish ./dist/*.tgz --family code-plugin --dry-run
+          clawhub package publish ./dist/*.tgz --family code-plugin
         env:
           CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
