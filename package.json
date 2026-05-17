@@ -72,7 +72,7 @@
     "openclaw": "^2026.4.20",
     "typescript": "^5.5.0",
     "typescript-eslint": "^8.0.0",
-    "vitest": "^3.0.0"
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "uuid": "^14.0.0",
