@@ -4,6 +4,7 @@
 
 ### Security
 
+- Regenerate `package-lock.json` to apply existing npm overrides for transitive CVE fixes (fast-uri, fast-xml-builder, hono, ip-address, protobufjs, basic-ftp, @anthropic-ai/sdk). All are transitive devDependencies with no production code impact.
 - Security: bump protobufjs to ^7.5.8 via npm override to address CVE-2026-44293, CVE-2026-44291, CVE-2026-44290, CVE-2026-44294, CVE-2026-44292, CVE-2026-44288 (code injection, DoS, prototype pollution). This is a transitive devDependency via @google/genai with no production code impact.
 
 ## 0.1.6
