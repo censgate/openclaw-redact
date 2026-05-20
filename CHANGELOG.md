@@ -5,6 +5,7 @@
 ### Security
 
 - Security: bump protobufjs to ^7.5.8 via npm override to address CVE-2026-44293, CVE-2026-44291, CVE-2026-44290, CVE-2026-44294, CVE-2026-44292, CVE-2026-44288 (code injection, DoS, prototype pollution). This is a transitive devDependency via @google/genai with no production code impact.
+- Security: refresh `package-lock.json` to pull `basic-ftp` 5.3.1 (GHSA-rpmf-866q-6p89), `brace-expansion` 5.0.6 (GHSA-jxxr-4gwj-5jf2), and `ws` 8.20.1 (GHSA-58qx-3vcg-4xpx). These remain transitive **devDependency** paths (OpenClaw gateway / agent stacks used in tests and local development); the published package runtime graph is still `uuid` and `zod` only.
 
 ## 0.1.6
 
