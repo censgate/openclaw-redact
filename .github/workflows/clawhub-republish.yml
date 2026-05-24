@@ -1,0 +1,65 @@
+name: ClawHub Republish
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Git ref (tag or branch) to publish
+        default: v0.1.7
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  clawhub-publish:
+    runs-on: ubuntu-latest
+    env:
+      CLAWHUB_DISABLE_TELEMETRY: 1
+      HAS_CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN != '' }}
+    steps:
+      - name: Check ClawHub token
+        run: |
+          if [ "$HAS_CLAWHUB_TOKEN" != "true" ]; then
+            echo "CLAWHUB_TOKEN not configured — skipping ClawHub publish"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Build ClawPack
+        run: npm pack --pack-destination ./dist/
+
+      - name: Install clawhub CLI
+        run: npm install -g clawhub
+
+      - name: Login to ClawHub
+        run: clawhub login --token "$CLAWHUB_TOKEN" --no-browser
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
+
+      - name: Publish to ClawHub
+        run: |
+          clawhub package publish ./dist/*.tgz --family code-plugin \
+            --source-repo censgate/openclaw-redact \
+            --source-commit "${{ github.sha }}" \
+            --dry-run
+          clawhub package publish ./dist/*.tgz --family code-plugin \
+            --source-repo censgate/openclaw-redact \
+            --source-commit "${{ github.sha }}"
+        env:
+          CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}

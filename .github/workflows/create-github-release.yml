@@ -150,7 +150,12 @@ jobs:
       - name: Publish to ClawHub
         if: env.HAS_CLAWHUB_TOKEN == 'true'
         run: |
-          clawhub package publish ./dist/*.tgz --family code-plugin --dry-run
-          clawhub package publish ./dist/*.tgz --family code-plugin
+          clawhub package publish ./dist/*.tgz --family code-plugin \
+            --source-repo censgate/openclaw-redact \
+            --source-commit "${{ github.sha }}" \
+            --dry-run
+          clawhub package publish ./dist/*.tgz --family code-plugin \
+            --source-repo censgate/openclaw-redact \
+            --source-commit "${{ github.sha }}"
         env:
           CLAWHUB_TOKEN: ${{ secrets.CLAWHUB_TOKEN }}
