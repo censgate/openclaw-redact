@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7
+
+### Patch Changes
+
+- 2c444f7: Security: regenerate lockfile and resolve npm audit advisories (transitive devDependencies only).
+
 ## [Unreleased]
 
 ### Security
