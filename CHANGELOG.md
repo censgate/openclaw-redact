@@ -10,6 +10,7 @@
 
 ### Security
 
+- Security: bump `hono` to ^4.12.21 (CVE-2026-47673, CVE-2026-47674, CVE-2026-47675, CVE-2026-47676) via npm override. Transitive devDependency via OpenClaw/MCP SDK; not used in published runtime (`uuid`, `zod` only). EPSS < 0.13%, CVSS 4.3–5.3.
 - Security: bump `qs` to ^6.15.2 (CVE-2026-8723) via npm override. Transitive devDependency (body-parser); not used in published runtime (`uuid`, `zod` only). EPSS 0.04%, CVSS 5.3.
 - Regenerate `package-lock.json` to apply existing npm overrides for transitive CVE fixes (fast-uri, fast-xml-builder, hono, ip-address, protobufjs, basic-ftp, @anthropic-ai/sdk). All are transitive devDependencies with no production code impact.
 - Security: bump protobufjs to ^7.5.8 via npm override to address CVE-2026-44293, CVE-2026-44291, CVE-2026-44290, CVE-2026-44294, CVE-2026-44292, CVE-2026-44288 (code injection, DoS, prototype pollution). This is a transitive devDependency via @google/genai with no production code impact.
