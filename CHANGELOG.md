@@ -11,6 +11,7 @@
 ### Security
 
 - Security: bump `vitest` to ^4.1.0 (CVE-2026-47429 / GHSA-5xrq-8626-4rwp). CVSS 9.8; EPSS not yet published. **devDependency** only (`vitest run` in CI; Vitest UI/API not exposed). Reachable in tests: yes; production runtime: no.
+- Security: bump `hono` to ^4.12.21 (CVE-2026-47673–47676). CVSS 4.3–5.3; EPSS 0.037%–0.125%. Transitive **devDependency** via OpenClaw/MCP SDK overrides; not imported in `src/`.
 - Security: bump `qs` to ^6.15.2 (CVE-2026-8723) via npm override. Transitive devDependency (body-parser); not used in published runtime (`uuid`, `zod` only). EPSS 0.04%, CVSS 5.3.
 - Regenerate `package-lock.json` to apply existing npm overrides for transitive CVE fixes (fast-uri, fast-xml-builder, hono, ip-address, protobufjs, basic-ftp, @anthropic-ai/sdk). All are transitive devDependencies with no production code impact.
 - Security: bump protobufjs to ^7.5.8 via npm override to address CVE-2026-44293, CVE-2026-44291, CVE-2026-44290, CVE-2026-44294, CVE-2026-44292, CVE-2026-44288 (code injection, DoS, prototype pollution). This is a transitive devDependency via @google/genai with no production code impact.
