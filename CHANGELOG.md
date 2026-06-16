@@ -10,6 +10,7 @@
 
 ### Security
 
+- Security: bump `protobufjs` to ^7.6.3, `tar` to ^7.5.16, and `ws` to ^8.21.0 via npm overrides (GHSA-f38q-mgvj-vph7, GHSA-wcpc-wj8m-hjx6, GHSA-vmf3-w455-68vh, GHSA-96hv-2xvq-fx4p). Transitive **devDependency** paths via OpenClaw / GenAI test stacks; published runtime remains `uuid` and `zod` only.
 - Security: bump `vitest` to ^4.1.0 (CVE-2026-47429 / GHSA-5xrq-8626-4rwp). CVSS 9.8; EPSS not yet published. **devDependency** only (`vitest run` in CI; Vitest UI/API not exposed). Reachable in tests: yes; production runtime: no.
 - Security: bump `hono` to ^4.12.21 (CVE-2026-47673–47676). CVSS 4.3–5.3; EPSS 0.037%–0.125%. Transitive **devDependency** via OpenClaw/MCP SDK overrides; not imported in `src/`.
 - Security: bump `qs` to ^6.15.2 (CVE-2026-8723) via npm override. Transitive devDependency (body-parser); not used in published runtime (`uuid`, `zod` only). EPSS 0.04%, CVSS 5.3.
